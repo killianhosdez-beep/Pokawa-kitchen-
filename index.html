@@ -76,6 +76,7 @@
         <input id="managerPassword" name="managerPassword" type="password" autocomplete="current-password" placeholder="Votre code confidentiel" required>
         <button class="btn primary full" type="submit">Ouvrir l'espace manager</button>
       </form>
+      <button id="quickManagerLogin" class="btn secondary full" type="button">Connexion rapide · Manager</button>
       <div id="loginError" class="error-text" role="alert"></div>
       <p class="login-foot">Accès réservé à l'équipe du restaurant.</p>
     </div>
@@ -787,6 +788,16 @@
   $$('.login-tab').forEach(b=>b.addEventListener('click',()=>switchLoginTab(b.dataset.loginTab)));
   $('#employeeLoginForm').addEventListener('submit',async e=>{e.preventDefault();setLoginError('');try{LIVE_CONFIGURED?await loginLive(e.currentTarget):await loginDemo(e.currentTarget,'employee');}catch(err){setLoginError(err.message||'Connexion impossible.');}});
   $('#managerLoginForm').addEventListener('submit',async e=>{e.preventDefault();setLoginError('');try{LIVE_CONFIGURED?await loginLive(e.currentTarget):await loginDemo(e.currentTarget,'manager');}catch(err){setLoginError(err.message||'Connexion impossible.');}});
+  $('#quickManagerLogin').addEventListener('click',()=>{
+    if(LIVE_CONFIGURED){setLoginError('La connexion rapide est désactivée en mode connecté.');return;}
+    user={id:'demo-manager',full_name:'Manager',role:'manager',mode:'demo'};
+    employees=demo.employees.map(e=>({...e}));
+    tasks=demo.tasks;
+    completions=Object.values(demo.completions);
+    history=demo.history;
+    dailyContext=demo.dailyContext[localDate()]||{};
+    showApp();
+  });
   $('#logoutBtn').addEventListener('click',async()=>{if(LIVE_CONFIGURED)await DB.auth.signOut();showLogin();});
   $$('[data-view]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));
   $$('[data-go-list]').forEach(b=>b.addEventListener('click',()=>{currentType=b.dataset.goList;switchView('checklistView');}));
@@ -822,7 +833,9 @@
     $('#modeNotice').textContent='La configuration en ligne est renseignée, mais le module de connexion ne s’est pas chargé. Vérifiez la connexion Internet puis rechargez la page. Les données locales ne seront pas utilisées.';
     $('#employeeLoginForm button[type="submit"]').disabled=true;
     $('#managerLoginForm button[type="submit"]').disabled=true;
+    $('#quickManagerLogin').classList.add('hidden');
   } else {
+    $('#quickManagerLogin').classList.remove('hidden');
     document.querySelector('label[for="employeeEmail"]').textContent='Identifiant employé';
     document.querySelector('label[for="managerEmail"]').textContent='Identifiant manager';
     $('#modeNotice').className='mode-notice';$('#modeNotice').innerHTML='<strong>Mode démonstration local.</strong><br>Employé : <b>employe1</b> / <b>1234</b> · Manager : <b>manager</b> / <b>2468</b>. Les données restent sur cet appareil et ne sont pas partagées.';
