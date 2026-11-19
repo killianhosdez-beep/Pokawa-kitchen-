@@ -27,6 +27,26 @@
 .dlc-check small{font-size:10px;color:var(--muted)}
 @media(max-width:650px){.morning-context-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.morning-context-bottom{align-items:stretch;flex-direction:column}.morning-context-bottom .btn{width:100%}}
 
+  
+/* Validation des quantités réellement produites */
+.production-modal{max-width:460px}
+.production-modal .production-summary{background:#edf5ef;border:1px solid #dcebe0;border-radius:12px;padding:12px 14px;margin:2px 0 6px}
+.production-modal .production-summary small{display:block;color:#66796d;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+.production-modal .production-summary strong{display:block;color:#214b38;font-size:20px;margin-top:3px}
+.production-modal .production-field{display:grid;gap:6px}
+.production-modal .production-field>span{font-size:12px;font-weight:750;color:#526159}
+.production-modal input,.production-modal select,.production-modal textarea{width:100%;border:1px solid #dce5df;border-radius:10px;padding:11px 12px;background:#fff;color:var(--ink);font:inherit}
+.production-modal textarea{min-height:76px;resize:vertical}
+.production-modal .production-help{font-size:10px;color:#7d8982;margin:0;line-height:1.45}
+.incomplete-panel{border:1px solid #f0dfbb;background:#fffaf0;border-radius:15px;padding:14px 15px;margin-bottom:17px}
+.incomplete-panel h3{font-size:14px;margin:0;color:#75551e}
+.incomplete-panel>p{font-size:11px;color:#8b713e;margin:4px 0 10px}
+.incomplete-list{display:grid;gap:8px}
+.incomplete-item{padding:10px 11px;background:#fff;border:1px solid #f0e7d5;border-radius:10px}
+.incomplete-item strong{display:block;font-size:12px;color:#3d4c42}
+.incomplete-item small{display:block;font-size:10px;color:#7d8982;margin-top:3px;line-height:1.4}
+.task-meta .shortfall-label{color:#9a6820}
+@media(max-width:560px){.production-modal{padding:18px}.production-modal .modal-actions{flex-direction:column-reverse}.production-modal .modal-actions .btn{width:100%}}
   </style>
   <script>window.POKAWA_CONFIG = { SUPABASE_URL: "", SUPABASE_ANON_KEY: "" };</script>
 </head>
@@ -111,6 +131,7 @@
         <div class="page-heading"><div><p class="eyebrow">ADMINISTRATION</p><h2>Espace manager</h2><p class="muted">Gérez les listes et les accès de l'équipe.</p></div><span class="manager-shield">◆</span></div>
         <div class="manager-tabs"><button class="manager-tab active" data-manager-tab="tasks">Préparations</button><button class="manager-tab" data-manager-tab="staff">Employés</button><button class="manager-tab" data-manager-tab="qr">QR code</button></div>
         <div id="managerTasksPanel" class="manager-panel">
+          <section id="incompleteProductionPanel" class="incomplete-panel hidden"><h3>Productions incomplètes aujourd’hui</h3><p>Les quantités manquantes et leurs motifs déclarés.</p><div id="incompleteProductionList" class="incomplete-list"></div></section>
           <div class="manager-toolbar"><div><h3>Gestion des listes</h3><p class="muted">Ajouter, modifier ou désactiver des tâches.</p></div></div>
           <label class="field-label" for="managerListSelect">Liste à modifier</label>
           <select id="managerListSelect" class="select-large"><option value="morning">Check du matin</option><option value="afternoon">Préparations après-midi</option><option value="defrost">Décongélations</option></select>
@@ -136,9 +157,38 @@
     </nav>
   </div>
   <div id="toast" class="toast" role="status"></div>
+
+  <dialog id="productionCompletionDialog" class="modal production-modal">
+    <form id="productionCompletionForm" method="dialog">
+      <div class="modal-head"><div><p class="eyebrow">VALIDATION DE PRODUCTION</p><h3 id="productionTaskTitle">Préparation</h3></div><button class="icon-btn" type="button" id="closeProductionDialog" aria-label="Fermer">×</button></div>
+      <div class="production-summary"><small>Quantité à produire</small><strong id="productionRequestedQuantity">—</strong></div>
+      <label class="production-field" for="productionActualQuantity"><span>Quantité réellement produite</span><input id="productionActualQuantity" type="text" maxlength="50" placeholder="Ex. 2 bacs" required></label>
+      <p class="production-help">Indique la quantité obtenue, avec la même unité que la quantité demandée.</p>
+      <div id="productionReasonBlock" class="hidden">
+        <label class="production-field" for="productionReason"><span>Pourquoi la quantité est-elle incomplète ?</span>
+          <select id="productionReason">
+            <option value="">Choisir un motif</option>
+            <option value="Rupture de stock">Rupture de stock</option>
+            <option value="Manque de matière première">Manque de matière première</option>
+            <option value="Manque de temps">Manque de temps</option>
+            <option value="Problème matériel">Problème matériel</option>
+            <option value="Produit non conforme">Produit non conforme</option>
+            <option value="Erreur d’inventaire">Erreur d’inventaire</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </label>
+        <p class="production-help">Un motif est obligatoire lorsqu’il manque une partie de la quantité demandée.</p>
+      </div>
+      <div id="productionCommentBlock" class="hidden">
+        <label class="production-field" for="productionComment"><span>Précision</span><textarea id="productionComment" maxlength="300" placeholder="Explique brièvement la situation…"></textarea></label>
+        <p class="production-help">Obligatoire pour le motif « Autre ».</p>
+      </div>
+      <div class="modal-actions"><button class="btn secondary" type="button" id="cancelProductionDialog">Annuler</button><button class="btn primary" id="confirmProductionCompletion" value="default">Valider la production</button></div>
+    </form>
+  </dialog>
   <dialog id="editTaskDialog" class="modal"><form id="editTaskForm" method="dialog"><div class="modal-head"><div><p class="eyebrow">MODIFIER LA TÂCHE</p><h3>Préparation</h3></div><button class="icon-btn" value="cancel" aria-label="Fermer">×</button></div><input id="editTaskId" type="hidden"><label class="field-label" for="editTaskTitle">Nom</label><input id="editTaskTitle" type="text" maxlength="90" required><label class="field-label" for="editTaskGroup">Rubrique</label><input id="editTaskGroup" type="text" maxlength="50"><label class="field-label" for="editTaskNote">Indication / quantité</label><input id="editTaskNote" type="text" maxlength="120"><div class="modal-actions"><button class="btn secondary" value="cancel">Annuler</button><button class="btn primary" id="saveTaskEdit" value="default">Enregistrer</button></div></form></dialog>
   <script>
-/* Pokawa Kitchen — v2
+/* Pokawa Kitchen — v3
    Mode DEMO : données stockées sur cet appareil uniquement.
    Mode EN LIGNE : Supabase Auth + PostgreSQL + Realtime, après configuration.
 */
@@ -246,6 +296,7 @@
   let realtimeChannel = null;
   let currentView = 'homeView';
   let toastTimer = null;
+  let pendingProductionTaskId = null;
 
   const actorName = () => user?.full_name || 'Équipe';
   const completionKey = (date, taskId) => `${date}::${taskId}`;
@@ -412,7 +463,8 @@
         const blocked=c && user.role!=='manager' && c.completed_by!==user.id;
         const draft=taskDrafts.get(t.id)||{};
         const fields=fieldsForType(currentType).map(([key,label])=>`<label class="task-field"><span>${escapeHtml(label)}</span><input type="text" inputmode="text" maxlength="50" data-task-field="${key}" value="${escapeHtml(draft[key] ?? record?.[key] ?? '')}" ${blocked?'disabled':''} aria-label="${escapeHtml(label)} pour ${escapeHtml(t.title)}"></label>`).join('');
-        return `<div class="task-row ${c?'done':''}" data-task-row="${escapeHtml(t.id)}"><button class="task-check" data-toggle-task="${escapeHtml(t.id)}" aria-label="${c?'Décocher':'Valider'} ${escapeHtml(t.title)}" ${blocked?'disabled':''}></button><div class="task-main"><span class="task-title">${escapeHtml(t.title)}</span>${t.note?`<span class="task-note">${escapeHtml(t.note)}</span>`:''}<div class="task-fields">${fields}</div></div><div class="task-meta">${c?`<b>${escapeHtml(who||'Réalisé')}</b><small>${escapeHtml(timeLabel(at))}</small>`:'<small>À faire</small>'}</div></div>`;
+        const productionMeta=c&&c.actual_quantity!=null?`<small>Réalisé : ${escapeHtml(c.actual_quantity)} / ${escapeHtml(c.requested_quantity||c.quantity_value||'—')}</small>${c.shortfall_reason?`<small class="shortfall-label">Motif : ${escapeHtml(c.shortfall_reason)}</small>`:''}`:'';
+        return `<div class="task-row ${c?'done':''}" data-task-row="${escapeHtml(t.id)}"><button class="task-check" data-toggle-task="${escapeHtml(t.id)}" aria-label="${c?'Décocher':'Valider'} ${escapeHtml(t.title)}" ${blocked?'disabled':''}></button><div class="task-main"><span class="task-title">${escapeHtml(t.title)}</span>${t.note?`<span class="task-note">${escapeHtml(t.note)}</span>`:''}<div class="task-fields">${fields}</div></div><div class="task-meta">${c?`<b>${escapeHtml(who||'Réalisé')}</b><small>${escapeHtml(timeLabel(at))}</small>${productionMeta}`:'<small>À faire</small>'}</div></div>`;
       }).join('')}</article>`;
     }).join('');
   }
@@ -443,16 +495,82 @@
     } catch(err) { showToast(`Enregistrement impossible : ${err.message||err}`); }
   }
 
-  async function toggleTask(taskId) {
-    const task=tasks.find(t=>t.id===taskId); if(!task)return;
+  function quantityAsNumber(value) {
+    const match=String(value??'').trim().replace(/\s/g,'').replace(',','.').match(/^-?\d+(?:\.\d+)?/);
+    return match?Number(match[0]):NaN;
+  }
+  function productionIsPartial(requested,actual) {
+    const planned=quantityAsNumber(requested),made=quantityAsNumber(actual);
+    if(Number.isFinite(planned)&&Number.isFinite(made)) return made<planned;
+    return String(requested??'').trim().toLocaleLowerCase('fr-FR')!==String(actual??'').trim().toLocaleLowerCase('fr-FR');
+  }
+  function updateProductionReasonVisibility() {
+    const taskId=pendingProductionTaskId; const row=taskId?$('[data-task-row="'+taskId+'"]'):null;
+    const requested=row?.querySelector('[data-task-field="quantity_value"]')?.value?.trim()||'';
+    const actual=$('#productionActualQuantity').value.trim();
+    const partial=Boolean(actual)&&productionIsPartial(requested,actual);
+    $('#productionReasonBlock').classList.toggle('hidden',!partial);
+    $('#productionReason').required=partial;
+    const other=partial&&$('#productionReason').value==='Autre';
+    $('#productionCommentBlock').classList.toggle('hidden',!other);
+    $('#productionComment').required=Boolean(other);
+    if(!partial){$('#productionReason').value='';$('#productionComment').value='';}
+    if(!other&&$('#productionReason').value!=='Autre') $('#productionComment').value='';
+  }
+  function openProductionDialog(task) {
+    const row=$('[data-task-row="'+task.id+'"]');
+    const requested=row?.querySelector('[data-task-field="quantity_value"]')?.value?.trim()||'';
+    if(!requested){showToast('Renseigne d’abord la quantité à produire.');return;}
+    const record=currentCompletion(task.id)||{};
+    pendingProductionTaskId=task.id;
+    $('#productionTaskTitle').textContent=task.title;
+    $('#productionRequestedQuantity').textContent=requested;
+    $('#productionActualQuantity').value=record.actual_quantity||'';
+    $('#productionReason').value=record.shortfall_reason||'';
+    $('#productionComment').value=record.shortfall_comment||'';
+    updateProductionReasonVisibility();
+    $('#productionCompletionDialog').showModal();
+    $('#productionActualQuantity').focus();
+  }
+  async function saveProductionCompletion(event) {
+    event.preventDefault();
+    const taskId=pendingProductionTaskId;
+    if(!taskId)return;
+    const row=$('[data-task-row="'+taskId+'"]');
+    const requested=row?.querySelector('[data-task-field="quantity_value"]')?.value?.trim()||'';
+    const actual=$('#productionActualQuantity').value.trim();
+    if(!requested){showToast('La quantité à produire est manquante.');return;}
+    if(!actual){showToast('Renseigne la quantité réellement produite.');$('#productionActualQuantity').focus();return;}
+    const partial=productionIsPartial(requested,actual);
+    const reason=$('#productionReason').value;
+    const comment=$('#productionComment').value.trim();
+    if(partial&&!reason){showToast('Choisis un motif pour expliquer la quantité incomplète.');$('#productionReason').focus();return;}
+    if(partial&&reason==='Autre'&&!comment){showToast('Ajoute une précision pour le motif « Autre ».');$('#productionComment').focus();return;}
+    const saved=await toggleTask(taskId,{
+      requested_quantity:requested,
+      actual_quantity:actual,
+      shortfall_reason:partial?reason:null,
+      shortfall_comment:partial?comment:null
+    });
+    if(saved){$('#productionCompletionDialog').close();pendingProductionTaskId=null;}
+  }
+  async function toggleTask(taskId,productionDetails=null) {
+    const task=tasks.find(t=>t.id===taskId); if(!task)return false;
     const existing=getDone(task); const existingRecord=currentCompletion(taskId); const checked=!existing;
     if (existing && user.role!=='manager' && existing.completed_by && existing.completed_by!==user.id) {
-      showToast('Seul un manager peut modifier la validation d’un collègue.');return;
+      showToast('Seul un manager peut modifier la validation d’un collègue.');return false;
     }
+    if(checked&&currentType==='afternoon'&&!productionDetails){openProductionDialog(task);return false;}
     try {
-      const row=$(`[data-task-row="${taskId}"]`);
+      const row=$('[data-task-row="'+taskId+'"]');
       const values={};
-      fieldsForType(currentType).forEach(([key])=>{values[key]=row?.querySelector(`[data-task-field="${key}"]`)?.value?.trim()||null;});
+      fieldsForType(currentType).forEach(([key])=>{values[key]=row?.querySelector('[data-task-field="'+key+'"]')?.value?.trim()||null;});
+      const storedProduction={
+        requested_quantity:productionDetails?.requested_quantity??existingRecord?.requested_quantity??values.quantity_value??null,
+        actual_quantity:checked?(productionDetails?.actual_quantity??existingRecord?.actual_quantity??null):(existingRecord?.actual_quantity??null),
+        shortfall_reason:checked?(productionDetails?.shortfall_reason??existingRecord?.shortfall_reason??null):(existingRecord?.shortfall_reason??null),
+        shortfall_comment:checked?(productionDetails?.shortfall_comment??existingRecord?.shortfall_comment??null):(existingRecord?.shortfall_comment??null)
+      };
       if (LIVE_CONFIGURED) {
         const payload={
           work_date:localDate(),task_id:taskId,completed:checked,
@@ -463,7 +581,11 @@
           production_value:values.production_value,
           afternoon_point_value:values.afternoon_point_value,
           quantity_value:values.quantity_value,
-          entry_note:values.entry_note
+          entry_note:values.entry_note,
+          requested_quantity:storedProduction.requested_quantity,
+          actual_quantity:storedProduction.actual_quantity,
+          shortfall_reason:storedProduction.shortfall_reason,
+          shortfall_comment:storedProduction.shortfall_comment
         };
         const {error}=await DB.from('checklist_completions').upsert(payload,{onConflict:'work_date,task_id'}); if(error)throw error;
         await loadLiveData();
@@ -471,17 +593,20 @@
         const key=completionKey(localDate(),taskId);
         const base=existingRecord||{work_date:localDate(),task_id:taskId,title_snapshot:task.title};
         if(checked){
-          demo.completions[key]={...base,...values,completed:true,completed_by:user.id,actor_name:actorName(),completed_at:new Date().toISOString(),title_snapshot:task.title};
+          demo.completions[key]={...base,...values,...storedProduction,completed:true,completed_by:user.id,actor_name:actorName(),completed_at:new Date().toISOString(),title_snapshot:task.title};
         } else {
-          demo.completions[key]={...base,...values,completed:false,completed_by:null,completed_at:null,last_changed_by:user.id};
+          demo.completions[key]={...base,...values,...storedProduction,completed:false,completed_by:null,completed_at:null,last_changed_by:user.id};
         }
-        logDemo(checked?'Validation':'Réouverture',currentType,task.title,{task_id:taskId,fields:values});
+        const isPartial=checked&&Boolean(storedProduction.shortfall_reason);
+        const description=productionDetails?'Demandé : '+storedProduction.requested_quantity+' · Réalisé : '+storedProduction.actual_quantity+(isPartial?' · Motif : '+storedProduction.shortfall_reason+(storedProduction.shortfall_comment?' — '+storedProduction.shortfall_comment:''):' · Production complète'):'';
+        logDemo(checked?(isPartial?'Validation partielle':'Validation'):'Réouverture',currentType,task.title,{task_id:taskId,fields:values,...(description?{description,requested_quantity:storedProduction.requested_quantity,actual_quantity:storedProduction.actual_quantity,shortfall_reason:storedProduction.shortfall_reason,shortfall_comment:storedProduction.shortfall_comment}:{})});
         completions=Object.values(demo.completions); saveDemo();
       }
       taskDrafts.delete(taskId);
       renderChecklist(); renderHome();
-      showToast(checked?'Préparation validée et enregistrée.':'Préparation remise à faire.');
-    } catch(err) { showToast(`Enregistrement impossible : ${err.message||err}`); }
+      showToast(checked?(storedProduction.shortfall_reason?'Production partielle enregistrée.':'Production validée et enregistrée.'):'Préparation remise à faire.');
+      return true;
+    } catch(err) { showToast('Enregistrement impossible : '+(err.message||err)); return false; }
   }
 
   async function renderHistory() {
@@ -498,14 +623,29 @@
     } else history=demo.history;
     const filtered=history.filter(e=>(type==='all'||e.list_type===type)&&(!date||localDayKey(new Date(e.created_at))===date));
     $('#historyItems').innerHTML=filtered.length?filtered.map(e=>{
-      const verb=e.action==='Validation'||e.action==='task_completed'?'a validé':e.action==='Réouverture'||e.action==='task_reopened'?'a rouvert':e.action==='task_added'?'a ajouté':e.action==='task_updated'?'a modifié':e.action==='task_deactivated'?'a désactivé':e.action==='task_reactivated'?'a réactivé':e.action==='employee_updated'?'a modifié le profil de':e.action==='employee_added'?'a ajouté l’employé':e.action==='employee_deactivated'?'a désactivé le compte de':e.action==='employee_reactivated'?'a réactivé le compte de':e.action==='daily_context_updated'?'a mis à jour':'a effectué une action sur';
+      const verb=e.action==='Validation partielle'?'a validé partiellement':e.action==='Validation'||e.action==='task_completed'?'a validé':e.action==='Réouverture'||e.action==='task_reopened'?'a rouvert':e.action==='task_added'?'a ajouté':e.action==='task_updated'?'a modifié':e.action==='task_deactivated'?'a désactivé':e.action==='task_reactivated'?'a réactivé':e.action==='employee_updated'?'a modifié le profil de':e.action==='employee_added'?'a ajouté l’employé':e.action==='employee_deactivated'?'a désactivé le compte de':e.action==='employee_reactivated'?'a réactivé le compte de':e.action==='daily_context_updated'?'a mis à jour':'a effectué une action sur';
       const name=e.title||e.details?.name||'un élément';
       return `<article class="history-entry"><i class="history-dot"></i><div><strong>${escapeHtml(e.actor_name)} ${verb} : ${escapeHtml(name)}</strong><p>${escapeHtml(TYPES[e.list_type]?.title||'Administration')} · ${escapeHtml(e.details?.description||'Action enregistrée')}</p></div><time>${escapeHtml(timeLabel(e.created_at))}</time></article>`;
     }).join(''):`<div class="empty-state"><div>↺</div><h3>Aucune activité trouvée</h3><p>Les validations apparaîtront ici au fur et à mesure.</p></div>`;
   }
 
+  function renderIncompleteProductions() {
+    const panel=$('#incompleteProductionPanel');
+    if(!panel)return;
+    const rows=completions.filter(r=>r.work_date===localDate()&&r.completed&&r.shortfall_reason);
+    panel.classList.toggle('hidden',rows.length===0);
+    $('#incompleteProductionList').innerHTML=rows.map(r=>{
+      const task=tasks.find(t=>t.id===r.task_id);
+      const name=task?.title||r.title_snapshot||'Préparation';
+      const who=LIVE_CONFIGURED?profileName(r.completed_by):(r.actor_name||profileName(r.completed_by));
+      const detail='Demandé : '+(r.requested_quantity||r.quantity_value||'—')+' · Réalisé : '+(r.actual_quantity||'—');
+      const reason='Motif : '+r.shortfall_reason+(r.shortfall_comment?' — '+r.shortfall_comment:'');
+      return '<article class="incomplete-item"><strong>'+escapeHtml(name)+'</strong><small>'+escapeHtml(detail)+'</small><small>'+escapeHtml(reason)+'</small><small>Par '+escapeHtml(who)+' · '+escapeHtml(timeLabel(r.completed_at))+'</small></article>';
+    }).join('');
+  }
   function renderManagerTasks() {
     if(user?.role!=='manager')return;
+    renderIncompleteProductions();
     const type=$('#managerListSelect').value; const rows=listTasks(type,true);
     $('#managerTaskList').innerHTML=rows.length?rows.map(t=>`<div class="manager-task ${t.active===false?'inactive':''}"><div><strong>${escapeHtml(t.title)} ${t.active===false?'<small>(désactivée)</small>':''}</strong><small>${escapeHtml(t.group_name||'Sans rubrique')}${t.note?` · ${escapeHtml(t.note)}`:''}</small></div><button data-edit-task="${escapeHtml(t.id)}">Modifier</button>${t.active===false?`<button data-reactivate-task="${escapeHtml(t.id)}">Réactiver</button>`:`<button class="danger" data-deactivate-task="${escapeHtml(t.id)}">Désactiver</button>`}</div>`).join(''):`<div class="empty-state"><h3>Liste vide</h3><p>Ajoutez les premières préparations ci-dessus.</p></div>`;
   }
@@ -591,6 +731,12 @@
   $$('[data-go-list]').forEach(b=>b.addEventListener('click',()=>{currentType=b.dataset.goList;switchView('checklistView');}));
   $$('[data-go-home]').forEach(b=>b.addEventListener('click',()=>switchView('homeView')));
   $('#taskGroups').addEventListener('click',e=>{const b=e.target.closest('[data-toggle-task]');if(b)toggleTask(b.dataset.toggleTask);});
+  $('#productionCompletionForm').addEventListener('submit',saveProductionCompletion);
+  $('#productionActualQuantity').addEventListener('input',updateProductionReasonVisibility);
+  $('#productionReason').addEventListener('change',updateProductionReasonVisibility);
+  $('#closeProductionDialog').addEventListener('click',()=>$('#productionCompletionDialog').close());
+  $('#cancelProductionDialog').addEventListener('click',()=>$('#productionCompletionDialog').close());
+  $('#productionCompletionDialog').addEventListener('close',()=>{pendingProductionTaskId=null;});
   $('#taskGroups').addEventListener('input',e=>{const input=e.target.closest('[data-task-field]');if(!input)return;const row=input.closest('[data-task-row]');if(!row)return;const draft=taskDrafts.get(row.dataset.taskRow)||{};draft[input.dataset.taskField]=input.value;taskDrafts.set(row.dataset.taskRow,draft);});
   [['morningEvent','event'],['morningTemperature','temperature'],['morningWeather','weather'],['morningForecastCa','forecast_ca']].forEach(([id,key])=>$('#'+id).addEventListener('input',e=>{morningContextDraft[key]=e.target.value;}));
   $('#morningDlcVerified').addEventListener('change',e=>{morningContextDraft.dlc_verified=e.target.checked;});
