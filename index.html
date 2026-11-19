@@ -236,7 +236,7 @@
     [
       ['Poulet Teriyaki X2',''],['KATSU16 pièces',''],['AIGUILLETTES VEGGIE',''],['TARTINE',''],['CREAM CHEESE',''],['TZATZIKI',''],
       ['THÉ GLACÉ 5L',''],['CITRONNADE 5L',''],['OLONG 5L',''],['JUS DE CITRON',''],['COOKIES',''],['EDAMAME X 6',''],['QUINOA X 6',''],['LENTILLE BELUGA',''],
-      ['BUBBLE','MP · FR'],['BOUTEILLES','CITRON · THÉ'],['COULIS','FRAM · MANGUE'],['SAUCE SATAY',''],['Sauce Massaman',''],['Sauce Piquante',''],['Sauce DIEGO',''],['Sauce Teriyaki',''],
+      ['Bubble fraise',''],['Bubble mangue passion',''],['BOUTEILLES','CITRON · THÉ'],['COULIS','FRAM · MANGUE'],['SAUCE SATAY',''],['Sauce Massaman',''],['Sauce Piquante',''],['Sauce DIEGO',''],['Sauce Teriyaki',''],
       ['CAROTTE RÔTIE',''],['Pois gourmands',''],['ALPRO',''],['Moelleux chocolat',''],['Cheesecake',''],['SKYR',''],['PUDDING',''],['MOCHIS','Mangue · Coco']
     ].forEach(([t,n])=>add('afternoon','Préparations après-midi',t,n));
     // Produits à décongeler pour la production du lendemain.
@@ -254,7 +254,7 @@
         {id:'demo-emp-2', full_name:'Employé 2', login:'employe2', password:'1234', role:'employee', active:true}
       ],
       manager: {login:'manager', password:'2468'},
-      dataVersion: 8,
+      dataVersion: 9,
       tasks: seedTasks(), completions:{}, dailyContext:{}, history:[]
     };
   }
@@ -358,6 +358,24 @@
             if(t.list_type==='morning' && title.startsWith('CREVETTES') && title.includes('1KG')) t.active=false;
           });
           saved.dataVersion=8;
+          saveDemo(saved);
+        }
+        if ((saved.dataVersion || 1) < 9) {
+          const bubbleRows=saved.tasks.filter(t=>t.list_type==='afternoon'&&String(t.title||'').trim().toUpperCase()==='BUBBLE');
+          let strawberry=bubbleRows[0];
+          if(strawberry){
+            strawberry.title='Bubble fraise';
+            strawberry.group_name='Préparations après-midi';
+            strawberry.note='';
+            strawberry.active=true;
+          } else {
+            strawberry={id:uuid(),list_type:'afternoon',group_name:'Préparations après-midi',title:'Bubble fraise',note:'',sort_order:saved.tasks.filter(t=>t.list_type==='afternoon').length,active:true};
+            saved.tasks.push(strawberry);
+          }
+          bubbleRows.slice(1).forEach(t=>t.active=false);
+          const passion=saved.tasks.find(t=>t.list_type==='afternoon'&&String(t.title||'').trim().toUpperCase()==='BUBBLE MANGUE PASSION');
+          if(!passion) saved.tasks.push({id:uuid(),list_type:'afternoon',group_name:'Préparations après-midi',title:'Bubble mangue passion',note:'',sort_order:(strawberry.sort_order||0)+1,active:true});
+          saved.dataVersion=9;
           saveDemo(saved);
         }
         return saved;
