@@ -254,7 +254,7 @@
         {id:'demo-emp-2', full_name:'Employé 2', login:'employe2', password:'1234', role:'employee', active:true}
       ],
       manager: {login:'manager', password:'2468'},
-      dataVersion: 4,
+      dataVersion: 6,
       tasks: seedTasks(), completions:{}, dailyContext:{}, history:[]
     };
   }
@@ -330,6 +330,19 @@
             if(task){task.group_name='Riz et protéines';task.sort_order=baseOrder+offset;task.active=true;}
           });
           saved.dataVersion=5;
+          saveDemo(saved);
+        }
+        if ((saved.dataVersion || 1) < 6) {
+          const shrimpRows=saved.tasks.filter(t=>t.list_type==='morning'&&String(t.title||'').trim().toUpperCase()==='CREVETTES');
+          if(shrimpRows.length){
+            const keep=shrimpRows.find(t=>saved.completions?.[t.id])||shrimpRows.find(t=>t.group_name==='Riz et protéines')||shrimpRows[0];
+            keep.title='Crevettes';
+            keep.group_name='Riz et protéines';
+            keep.note='À décongeler · À mariner';
+            keep.active=true;
+            shrimpRows.forEach(t=>{if(t.id!==keep.id)t.active=false;});
+          }
+          saved.dataVersion=6;
           saveDemo(saved);
         }
         return saved;
