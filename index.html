@@ -254,7 +254,7 @@
         {id:'demo-emp-2', full_name:'Employé 2', login:'employe2', password:'1234', role:'employee', active:true}
       ],
       manager: {login:'manager', password:'2468'},
-      dataVersion: 10,
+      dataVersion: 11,
       tasks: seedTasks(), completions:{}, dailyContext:{}, history:[]
     };
   }
@@ -393,6 +393,19 @@
           saved.dataVersion=10;
           saveDemo(saved);
         }
+        // Nettoyage permanent des anciennes lignes Bubble : ne dépend pas du numéro de migration.
+        const afternoonBubbles=saved.tasks.filter(t=>t.list_type==='afternoon'&&String(t.title||'').toUpperCase().includes('BUBBLE'));
+        const firstBubbleOrder=Math.min(...afternoonBubbles.map(t=>Number(t.sort_order)||0),saved.tasks.filter(t=>t.list_type==='afternoon').length);
+        afternoonBubbles.forEach(t=>{t.active=false;});
+        const ensureBubble=(title,order)=>{
+          let row=saved.tasks.find(t=>t.list_type==='afternoon'&&String(t.title||'').trim().toUpperCase()===title.toUpperCase());
+          if(!row){row={id:uuid(),list_type:'afternoon',group_name:'Préparations après-midi',title,note:'',sort_order:order,active:true};saved.tasks.push(row);}
+          else {row.title=title;row.group_name='Préparations après-midi';row.note='';row.sort_order=order;row.active=true;}
+        };
+        ensureBubble('Bubble fraise',firstBubbleOrder);
+        ensureBubble('Bubble mangue passion',firstBubbleOrder+1);
+        saved.dataVersion=11;
+        saveDemo(saved);
         return saved;
       }
     } catch (_) {}
