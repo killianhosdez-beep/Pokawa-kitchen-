@@ -254,7 +254,7 @@
         {id:'demo-emp-2', full_name:'Employé 2', login:'employe2', password:'1234', role:'employee', active:true}
       ],
       manager: {login:'manager', password:'2468'},
-      dataVersion: 9,
+      dataVersion: 10,
       tasks: seedTasks(), completions:{}, dailyContext:{}, history:[]
     };
   }
@@ -376,6 +376,21 @@
           const passion=saved.tasks.find(t=>t.list_type==='afternoon'&&String(t.title||'').trim().toUpperCase()==='BUBBLE MANGUE PASSION');
           if(!passion) saved.tasks.push({id:uuid(),list_type:'afternoon',group_name:'Préparations après-midi',title:'Bubble mangue passion',note:'',sort_order:(strawberry.sort_order||0)+1,active:true});
           saved.dataVersion=9;
+          saveDemo(saved);
+        }
+        if ((saved.dataVersion || 1) < 10) {
+          const afternoon=saved.tasks.filter(t=>t.list_type==='afternoon');
+          const bubbleLike=afternoon.filter(t=>String(t.title||'').toUpperCase().includes('BUBBLE'));
+          bubbleLike.forEach(t=>{t.active=false;});
+          const ensure=(title,order)=>{
+            let row=afternoon.find(t=>String(t.title||'').trim().toUpperCase()===title.toUpperCase());
+            if(!row){row={id:uuid(),list_type:'afternoon',group_name:'Préparations après-midi',title,note:'',sort_order:order,active:true};saved.tasks.push(row);}
+            else {row.title=title;row.group_name='Préparations après-midi';row.note='';row.active=true;row.sort_order=order;}
+          };
+          const base=Math.min(...bubbleLike.map(t=>Number(t.sort_order)||0),afternoon.length);
+          ensure('Bubble fraise',base);
+          ensure('Bubble mangue passion',base+1);
+          saved.dataVersion=10;
           saveDemo(saved);
         }
         return saved;
