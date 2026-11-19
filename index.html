@@ -1,28 +1,629 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#12372e">
-<title>Pokawa Kitchen — Aperçu</title>
-<style>
-:root{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#18352e;background:#f4f7f4}*{box-sizing:border-box}body{margin:0}.top{background:#12372e;color:white;padding:22px 20px 30px;border-radius:0 0 26px 26px}.brand{font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.8}.top h1{font-size:27px;margin:8px 0 4px}.top p{margin:0;color:#d3e4dc;font-size:14px}.wrap{max-width:680px;margin:auto;padding:22px 16px 40px}.eyebrow{font-size:11px;letter-spacing:.12em;color:#688078;font-weight:800}.date{display:flex;justify-content:space-between;align-items:center;margin:4px 0 18px}.date strong{font-size:20px}.pill{font-size:11px;background:#e1eee7;color:#23624c;border-radius:30px;padding:7px 10px;font-weight:700}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:18px 0 26px}.stat{background:white;border:1px solid #e6ece7;border-radius:15px;padding:13px 11px;box-shadow:0 3px 12px #18352e08}.stat b{display:block;font-size:21px;margin:6px 0 2px}.stat small{font-size:11px;color:#708078}.section{font-size:18px;margin:0 0 12px}.task{display:flex;align-items:center;gap:13px;background:white;padding:16px;margin:10px 0;border:1px solid #e4ebe5;border-radius:16px;box-shadow:0 3px 12px #18352e08}.ico{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;font-size:21px;background:#fff2d9}.ico.blue{background:#e8f1fb}.ico.green{background:#e3f1e8}.task b{display:block;font-size:14px}.task small{display:block;color:#7b8982;font-size:12px;margin-top:4px}.arrow{margin-left:auto;color:#93a29a;font-size:24px}.note{margin-top:20px;padding:15px;border-radius:14px;background:#e7f1eb;color:#315c49;font-size:13px;line-height:1.5}.foot{text-align:center;color:#84918a;font-size:11px;margin-top:24px}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#132c26">
+  <meta name="description" content="Pokawa Kitchen — checklists de production et de décongélation">
+  <title>Pokawa Kitchen</title>
+  <style>
+:root{--green:#173b31;--green-2:#235344;--mint:#e6f1eb;--ink:#17231f;--muted:#697770;--line:#e3e9e5;--paper:#fff;--bg:#f4f7f4;--gold:#d9a441;--red:#b94c45;--shadow:0 12px 34px rgba(18,44,35,.08);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-size:15px}button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid rgba(35,126,95,.25);outline-offset:2px}.hidden{display:none!important}.muted{color:var(--muted);margin:5px 0 0;line-height:1.45}.eyebrow{font-size:10px;letter-spacing:.15em;font-weight:800;color:#7e8b84;margin:0 0 8px}.brand-mark{width:54px;height:54px;border-radius:17px;background:var(--green);color:#fff;display:grid;place-items:center;font-size:30px;font-weight:900;font-style:italic;box-shadow:0 8px 22px rgba(23,59,49,.2)}.brand-mark.small{width:38px;height:38px;border-radius:12px;font-size:21px}.login-screen{min-height:100dvh;display:grid;place-items:center;padding:22px;background:radial-gradient(circle at 10% 10%,#e7f2ec,transparent 38%),var(--bg)}.login-card{width:min(100%,430px);background:#fff;border:1px solid #e8eee9;border-radius:26px;padding:30px;box-shadow:var(--shadow)}.login-card .brand-mark{margin-bottom:22px}.login-card h1{font-size:31px;letter-spacing:-1.3px;margin:0}.login-card h1 span{color:var(--green-2)}.intro{margin:8px 0 20px}.mode-notice{padding:10px 12px;border-radius:12px;background:#fff7e7;border:1px solid #f1dfb5;color:#73531c;font-size:12px;line-height:1.4;margin:14px 0}.mode-notice.live{background:#e9f6ef;border-color:#d3e9db;color:#245a40}.login-tabs,.manager-tabs{display:flex;gap:5px;background:#f0f4f1;padding:4px;border-radius:13px;margin:18px 0}.login-tab,.manager-tab{border:0;background:transparent;color:#65736b;padding:10px 14px;border-radius:10px;font-weight:700;font-size:13px;flex:1}.login-tab.active,.manager-tab.active{background:#fff;color:var(--green);box-shadow:0 2px 8px rgba(30,65,49,.08)}.login-form{display:flex;flex-direction:column;gap:9px}.login-form label,.field-label{font-size:12px;font-weight:750;color:#526159;margin-top:5px}.login-form input,.staff-form input,.add-task-form input,.modal input,.select-large,.history-filter input,.history-filter select{border:1px solid #dce5df;background:#fff;border-radius:11px;padding:12px 13px;min-width:0;color:var(--ink)}.login-form input{margin-bottom:6px}.btn{border:0;border-radius:11px;padding:12px 16px;font-weight:750;font-size:13px;transition:transform .12s,background .12s}.btn:active{transform:scale(.985)}.btn.primary{background:var(--green);color:#fff}.btn.primary:hover{background:#245747}.btn.secondary{background:#edf3ef;color:var(--green)}.btn.full{width:100%;margin-top:8px}.error-text{min-height:18px;color:var(--red);font-size:12px;margin-top:10px}.login-foot{text-align:center;color:#8b9790;font-size:11px;margin:12px 0 0}.app-shell{min-height:100dvh;padding-bottom:90px}.topbar{height:70px;background:#fff;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:0 max(20px,calc((100vw - 1080px)/2));position:sticky;top:0;z-index:10}.brand-inline{display:flex;align-items:center;gap:10px}.brand-inline strong{display:block;font-size:14px;letter-spacing:-.3px}.brand-inline small{display:block;color:#7b8880;font-size:10px;margin-top:2px}.top-actions{display:flex;align-items:center;gap:12px}.sync-pill{display:flex;align-items:center;gap:6px;background:#f0f4f1;padding:7px 10px;border-radius:99px;color:#627168;font-size:10px;font-weight:800}.sync-pill i{width:6px;height:6px;border-radius:50%;background:#d3a33d}.sync-pill.online i{background:#2da36b}.icon-btn{width:36px;height:36px;border:1px solid var(--line);background:#fff;border-radius:10px;color:var(--green);font-size:19px}.main-content{max-width:1080px;margin:0 auto;padding:28px 22px 30px}.view{display:none}.view.active{display:block}.welcome-row,.page-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}.welcome-row h2,.page-heading h2{font-size:28px;letter-spacing:-1px;margin:0}.date-chip{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 13px;color:#506057;font-size:12px;font-weight:750;white-space:nowrap}.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-bottom:30px}.stat-card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:17px;display:flex;gap:12px;align-items:center;box-shadow:0 3px 12px rgba(22,49,39,.025)}.stat-icon,.launcher-icon{width:39px;height:39px;border-radius:12px;display:grid;place-items:center;font-size:19px;flex-shrink:0}.morning{background:#fff3d9;color:#a16d17}.afternoon{background:#e8f0ff;color:#4268a5}.defrost{background:#e5f4f7;color:#287889}.stat-card span{display:block;color:#67766d;font-size:11px}.stat-card strong{display:block;font-size:22px;letter-spacing:-.6px;margin:2px 0}.stat-card small{font-size:10px;color:#89958e}.section-heading{margin:0 0 12px}.section-heading h3,.manager-toolbar h3{margin:0;font-size:17px;letter-spacing:-.4px}.list-launchers{display:grid;gap:10px}.launcher-card{position:relative;display:flex;gap:13px;align-items:center;text-align:left;width:100%;background:#fff;border:1px solid var(--line);border-radius:15px;padding:15px 16px;box-shadow:0 2px 10px rgba(23,59,49,.025);color:var(--ink)}.launcher-card:hover{border-color:#b7cec1;transform:translateY(-1px)}.launcher-card b{display:block;font-size:13px}.launcher-card small{display:block;font-size:11px;color:#849087;margin-top:4px}.launcher-card .arrow{font-size:25px;color:#98a49d;margin-left:auto}.launcher-progress{font-size:11px;color:var(--green);font-weight:800;min-width:34px;text-align:right}.callout{background:#eaf3ed;border-radius:15px;padding:15px 17px;margin-top:22px;color:#28503e}.callout strong{font-size:12px}.callout p{font-size:11px;line-height:1.5;margin:4px 0 0;color:#587365}.page-heading{justify-content:flex-start}.back-btn{width:38px;height:38px;border:1px solid var(--line);background:#fff;border-radius:12px;font-size:25px;color:var(--green);flex-shrink:0}.page-heading h2{font-size:25px}.progress-card{background:#fff;border:1px solid var(--line);padding:16px 18px;border-radius:16px;margin-bottom:20px}.progress-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}.progress-top strong{font-size:15px}.progress-top small{font-size:11px;color:#89958e}.progress-top>strong:last-child{color:var(--green)}.progress-track{height:8px;background:#edf1ee;border-radius:10px;overflow:hidden}.progress-fill{height:100%;width:0;background:linear-gradient(90deg,#267b5a,#54a77a);border-radius:10px;transition:width .25s}.progress-card>small{display:block;margin-top:9px;font-size:10px}.task-groups{display:grid;gap:18px}.task-group{background:#fff;border:1px solid var(--line);border-radius:17px;overflow:hidden}.group-heading{padding:12px 16px;background:#f7f9f7;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.group-heading h3{margin:0;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#52645a}.group-heading span{font-size:10px;color:#819087}.task-row{display:flex;gap:12px;align-items:center;padding:13px 15px;border-bottom:1px solid #eff2ef;min-height:61px}.task-row:last-child{border-bottom:0}.task-check{width:23px;height:23px;border:2px solid #c8d4cc;border-radius:7px;flex-shrink:0;display:grid;place-items:center;color:#fff;background:#fff}.task-row.done .task-check{background:#287d5a;border-color:#287d5a}.task-check:after{content:'✓';font-size:15px;font-weight:900;display:none}.task-row.done .task-check:after{display:block}.task-main{flex:1;min-width:0}.task-title{display:block;font-size:13px;font-weight:750;line-height:1.3}.task-note{display:block;color:#87948c;font-size:10px;margin-top:3px}.task-fields{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.task-field{display:flex;flex-direction:column;gap:3px;min-width:78px;max-width:120px;flex:1}.task-field span{font-size:8px;font-weight:800;letter-spacing:.02em;color:#809087;text-transform:uppercase}.task-field input{width:100%;min-width:0;border:1px solid #dfe8e2;border-radius:7px;padding:6px 7px;font-size:11px;color:var(--ink);background:#fbfcfb}.task-field input:disabled{background:#f2f5f2;color:#7b897f}.task-row{align-items:flex-start}.task-check{margin-top:2px}.task-meta{padding-top:2px}.task-meta{text-align:right;min-width:95px}.task-meta b{display:block;color:#3c6e55;font-size:10px}.task-meta small{display:block;color:#95a098;font-size:9px;margin-top:3px}.task-row.done .task-title{text-decoration:line-through;text-decoration-color:#a0b6a8;color:#89958e}.empty-state{text-align:center;background:#fff;border:1px dashed #cfdcd3;border-radius:17px;padding:35px 20px}.empty-state>div{font-size:28px;color:#6b9c7f}.empty-state h3{margin:8px 0 5px}.empty-state p{margin:0;color:#7d8a82;font-size:12px}.history-filter{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}.history-filter label{font-size:10px;font-weight:800;color:#758279}.history-filter select,.history-filter input{padding:8px 10px;font-size:11px}.history-items{display:grid;gap:8px}.history-entry{background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px 15px;display:flex;gap:12px;align-items:flex-start}.history-dot{width:9px;height:9px;border-radius:50%;background:#36936a;margin-top:5px;flex-shrink:0}.history-entry strong{font-size:12px;display:block}.history-entry p{margin:4px 0 0;color:#7d8982;font-size:10px;line-height:1.45}.history-entry time{font-size:10px;color:#89958e;white-space:nowrap;margin-left:auto}.manager-shield{width:40px;height:40px;border-radius:13px;background:#e8f1eb;color:#2c664c;display:grid;place-items:center}.manager-panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:17px}.manager-toolbar{margin-bottom:16px}.manager-toolbar p{font-size:11px}.select-large{width:100%;margin:7px 0 13px}.add-task-form{display:grid;grid-template-columns:1.2fr 1fr auto;gap:8px;margin-bottom:15px}.add-task-form input{padding:10px;font-size:12px}.add-task-form .btn{padding:10px 13px}.manager-task-list,.employee-list{display:grid;gap:7px}.manager-task{border:1px solid #e8eee9;border-radius:11px;padding:10px 11px;display:flex;gap:10px;align-items:center}.manager-task>div:first-child{flex:1;min-width:0}.manager-task strong{font-size:12px;display:block}.manager-task small{font-size:10px;color:#89958e}.manager-task button,.employee-item button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 9px;color:#53665a;font-size:11px}.manager-task button.danger,.employee-item button.danger{color:#a3443d}.staff-form{display:grid;gap:8px;padding:14px;background:#f8faf8;border:1px solid #edf1ed;border-radius:13px;margin-bottom:17px}.staff-form input{width:100%;font-size:12px}.staff-form .field-label{margin-bottom:-3px}.employee-item{border:1px solid var(--line);border-radius:11px;padding:11px;display:flex;align-items:center;gap:10px}.avatar{width:34px;height:34px;border-radius:11px;background:#e9f2ec;color:#2a694d;display:grid;place-items:center;font-weight:800;font-size:12px;flex-shrink:0}.employee-item>div:nth-child(2){flex:1;min-width:0}.employee-item strong{display:block;font-size:12px}.employee-item small{display:block;color:#859188;font-size:10px;overflow-wrap:anywhere}.employee-item.inactive{opacity:.55}.qr-card{text-align:center;padding:10px}.qr-card h3{margin:0 0 5px}.qr-card>p:not(.eyebrow){font-size:12px;max-width:440px;margin:7px auto 14px}.qr-placeholder{width:180px;height:180px;border:1px dashed #bdcfc2;border-radius:14px;margin:18px auto;display:grid;place-items:center;color:#8a9a8f;font-size:42px;background:#f8faf8}.qr-url{font-size:10px!important;overflow-wrap:anywhere}.qr-card .btn{margin:4px}.bottom-nav{position:fixed;z-index:15;bottom:0;left:0;right:0;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;justify-content:center;padding:8px max(8px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom));gap:3px}.nav-item{border:0;background:transparent;color:#8a968e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:66px;padding:5px 9px;border-radius:11px}.nav-item span{font-size:19px;line-height:20px}.nav-item small{font-size:9px;font-weight:700}.nav-item.active{color:var(--green);background:#eef5f0}.toast{position:fixed;z-index:30;left:50%;bottom:95px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#203d32;color:#fff;padding:11px 15px;border-radius:12px;font-size:12px;box-shadow:var(--shadow);transition:all .2s;max-width:calc(100vw - 32px);text-align:center}.toast.show{opacity:1;transform:translate(-50%,0)}.modal{border:0;border-radius:19px;padding:21px;width:min(92vw,420px);box-shadow:0 25px 70px rgba(0,0,0,.2)}.modal::backdrop{background:rgba(10,26,20,.48)}.modal form{display:grid;gap:9px}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}.modal-head h3{margin:0}.modal input{width:100%}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+@media(min-width:760px){.main-content{padding-top:38px}.stats-grid{gap:16px}.list-launchers{grid-template-columns:repeat(3,1fr)}.launcher-card{min-height:110px;align-items:flex-start;flex-wrap:wrap}.launcher-card>span:nth-child(2){width:calc(100% - 56px)}.launcher-card .arrow{position:absolute;right:13px;top:15px}.launcher-progress{position:absolute;bottom:14px;right:17px}.task-groups{grid-template-columns:repeat(2,minmax(0,1fr))}.bottom-nav{gap:20px}.nav-item{min-width:90px}.manager-panel{padding:22px}}
+@media(max-width:560px){.main-content{padding:22px 14px 25px}.topbar{padding:0 14px}.stats-grid{grid-template-columns:1fr;gap:8px}.stat-card{padding:12px 14px}.stat-icon{width:35px;height:35px}.stat-card strong{font-size:19px}.welcome-row h2{font-size:24px}.date-chip{font-size:10px;padding:8px}.add-task-form{grid-template-columns:1fr 1fr}.add-task-form .btn{grid-column:1/-1}.task-meta{min-width:76px}.manager-tabs{gap:2px}.manager-tab{padding:9px 6px;font-size:11px}.history-filter{gap:5px}.history-filter select,.history-filter input{flex:1;min-width:112px}.bottom-nav{justify-content:space-around}.nav-item{min-width:0;flex:1;padding:5px 2px}.login-card{padding:24px}.page-heading h2{font-size:22px}}
+@media print{body{background:#fff}.topbar,.main-content>.view:not(#managerView),.bottom-nav,#managerView>.page-heading,#managerView>.manager-tabs,#managerView>#managerTasksPanel,#managerView>#managerStaffPanel,#toast{display:none!important}#managerView{display:block!important}.manager-panel{display:none!important}#managerQrPanel{display:block!important;border:0;padding:0}.qr-card{padding:20px}.qr-card .btn{display:none!important}.qr-card h3{font-size:24px}.qr-placeholder{border:0}}
+
+
+.morning-context{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin:0 0 18px;box-shadow:0 2px 10px rgba(23,59,49,.025)}
+.morning-context-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.morning-context-heading h3{margin:0;font-size:16px;letter-spacing:-.3px}
+.morning-context-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.morning-context-grid label{display:grid;gap:5px;font-size:10px;font-weight:800;color:#748178}
+.morning-context-grid input{width:100%;min-width:0;border:1px solid #dce5df;background:#fff;border-radius:9px;padding:10px 11px;font-size:12px;color:var(--ink)}
+.morning-context-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid #edf1ed}
+.dlc-check{display:flex;align-items:center;gap:9px;cursor:pointer}
+.dlc-check input{width:19px;height:19px;accent-color:var(--green)}
+.dlc-check span{display:grid;gap:2px}
+.dlc-check b{font-size:12px;color:var(--ink)}
+.dlc-check small{font-size:10px;color:var(--muted)}
+@media(max-width:650px){.morning-context-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.morning-context-bottom{align-items:stretch;flex-direction:column}.morning-context-bottom .btn{width:100%}}
+
+  </style>
+  <script>window.POKAWA_CONFIG = { SUPABASE_URL: "", SUPABASE_ANON_KEY: "" };</script>
 </head>
 <body>
-<header class="top"><div class="brand">Outil de production · Cagnes-sur-Mer</div><h1>Pokawa Kitchen</h1><p>Les checklists de l'équipe, réunies au même endroit.</p></header>
-<main class="wrap">
-<div class="date"><div><div class="eyebrow">TABLEAU DE BORD</div><strong>Bonjour l'équipe 👋</strong></div><span class="pill">APERÇU V1</span></div>
-<div class="stats">
-<div class="stat"><span>☀️</span><b>0/23</b><small>Check du matin</small></div>
-<div class="stat"><span>🕒</span><b>0/30</b><small>Prépas après-midi</small></div>
-<div class="stat"><span>❄️</span><b>0/9</b><small>Décongélations</small></div>
-</div>
-<h2 class="section">Les listes du jour</h2>
-<div class="task"><div class="ico">☀️</div><div><b>Check du matin</b><small>Inventaire · Découpe · Riz · Protéines</small></div><span class="arrow">›</span></div>
-<div class="task"><div class="ico blue">🕒</div><div><b>Préparations après-midi</b><small>Quantités et réalisations</small></div><span class="arrow">›</span></div>
-<div class="task"><div class="ico green">❄️</div><div><b>Décongélations</b><small>À anticiper pour le lendemain</small></div><span class="arrow">›</span></div>
-<div class="note"><strong>Traçabilité prévue</strong><br>Chaque validation conservera le nom de la personne et l'heure de réalisation. Les managers pourront gérer les listes et les accès de l'équipe.</div>
-<div class="foot">Maquette visuelle — pas encore connectée aux comptes ni à la synchronisation.</div>
-</main>
-</body></html>
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="brand-mark">P</div>
+      <p class="eyebrow">OUTIL DE PRODUCTION</p>
+      <h1>Pokawa <span>Kitchen</span></h1>
+      <p class="muted intro">Les checklists du restaurant, réunies au même endroit.</p>
+      <div id="modeNotice" class="mode-notice"></div>
+      <div class="login-tabs">
+        <button class="login-tab active" data-login-tab="employee">Employé</button>
+        <button class="login-tab" data-login-tab="manager">Manager</button>
+      </div>
+      <form id="employeeLoginForm" class="login-form">
+        <label for="employeeEmail">Adresse e-mail ou identifiant (démo)</label>
+        <input id="employeeEmail" name="employeeEmail" type="text" autocomplete="username" placeholder="prenom@exemple.fr" required>
+        <label for="employeePassword">Mot de passe</label>
+        <input id="employeePassword" name="employeePassword" type="password" autocomplete="current-password" placeholder="Votre mot de passe" required>
+        <button class="btn primary full" type="submit">Accéder aux checklists</button>
+      </form>
+      <form id="managerLoginForm" class="login-form hidden">
+        <label for="managerEmail">Adresse e-mail manager ou identifiant (démo)</label>
+        <input id="managerEmail" name="managerEmail" type="text" autocomplete="username" placeholder="manager@exemple.fr" required>
+        <label for="managerPassword">Code / mot de passe manager</label>
+        <input id="managerPassword" name="managerPassword" type="password" autocomplete="current-password" placeholder="Votre code confidentiel" required>
+        <button class="btn primary full" type="submit">Ouvrir l'espace manager</button>
+      </form>
+      <div id="loginError" class="error-text" role="alert"></div>
+      <p class="login-foot">Accès réservé à l'équipe du restaurant.</p>
+    </div>
+  </div>
+
+  <div id="appShell" class="app-shell hidden">
+    <header class="topbar">
+      <div class="brand-inline"><div class="brand-mark small">P</div><div><strong>Pokawa Kitchen</strong><small id="headerSubtitle">Cagnes-sur-Mer · Cuisine</small></div></div>
+      <div class="top-actions"><span id="syncPill" class="sync-pill"><i></i> Local</span><button id="logoutBtn" class="icon-btn" title="Déconnexion" aria-label="Déconnexion">↪</button></div>
+    </header>
+
+    <main class="main-content">
+      <section id="homeView" class="view active">
+        <div class="welcome-row"><div><p class="eyebrow" id="todayLabel">AUJOURD'HUI</p><h2>Bonjour <span id="welcomeName">l'équipe</span> 👋</h2><p class="muted">Voici le suivi de production du jour.</p></div><div class="date-chip" id="dateChip"></div></div>
+        <div class="stats-grid">
+          <article class="stat-card"><div class="stat-icon morning">☀</div><div><span>Check du matin</span><strong id="morningProgress">0/0</strong><small id="morningPercent">À commencer</small></div></article>
+          <article class="stat-card"><div class="stat-icon afternoon">◷</div><div><span>Préparations après-midi</span><strong id="afternoonProgress">0/0</strong><small id="afternoonPercent">À commencer</small></div></article>
+          <article class="stat-card"><div class="stat-icon defrost">❄</div><div><span>Décongélations</span><strong id="defrostProgress">0/0</strong><small id="defrostPercent">À compléter</small></div></article>
+        </div>
+        <div class="section-heading"><div><p class="eyebrow">ACCÈS RAPIDE</p><h3>Les listes du jour</h3></div></div>
+        <div class="list-launchers">
+          <button class="launcher-card" data-go-list="morning"><span class="launcher-icon morning">☀</span><span><b>Check du matin</b><small>Inventaire et production matinée</small></span><span class="arrow">›</span><span class="launcher-progress" id="launchMorning"></span></button>
+          <button class="launcher-card" data-go-list="afternoon"><span class="launcher-icon afternoon">◷</span><span><b>Préparations après-midi</b><small>Quantités et réalisations</small></span><span class="arrow">›</span><span class="launcher-progress" id="launchAfternoon"></span></button>
+          <button class="launcher-card" data-go-list="defrost"><span class="launcher-icon defrost">❄</span><span><b>Décongélations</b><small>À anticiper pour J+1</small></span><span class="arrow">›</span><span class="launcher-progress" id="launchDefrost"></span></button>
+        </div>
+        <div class="callout"><strong>Traçabilité active</strong><p>Chaque validation conserve le nom de la personne et l'heure de réalisation.</p></div>
+      </section>
+
+      <section id="checklistView" class="view">
+        <div class="page-heading"><button class="back-btn" data-go-home aria-label="Retour">‹</button><div><p class="eyebrow" id="listEyebrow">CHECKLIST DU JOUR</p><h2 id="listTitle">Check du matin</h2><p class="muted" id="listDescription">Cochez chaque tâche après réalisation.</p></div></div>
+        <div class="progress-card"><div class="progress-top"><div><strong id="listProgressCount">0 sur 0</strong><small> tâches terminées</small></div><strong id="listProgressPercent">0 %</strong></div><div class="progress-track"><div id="listProgressBar" class="progress-fill"></div></div><small id="listDateSmall" class="muted"></small></div>
+        <section id="morningContextCard" class="morning-context hidden" aria-label="Informations du jour">
+          <div class="morning-context-heading"><div><p class="eyebrow">EN-TÊTE DE LA FICHE</p><h3>Informations du service</h3></div><span id="morningContextDate" class="date-chip"></span></div>
+          <div class="morning-context-grid">
+            <label>Événement<input id="morningEvent" type="text" maxlength="120" placeholder="Événement du jour"></label>
+            <label>Température<input id="morningTemperature" type="text" maxlength="30" placeholder="Ex. 18 °C"></label>
+            <label>Météo<input id="morningWeather" type="text" maxlength="40" placeholder="Ex. Ensoleillé"></label>
+            <label>CA prévu<input id="morningForecastCa" type="text" maxlength="40" inputmode="decimal" placeholder="Ex. 4 000 €"></label>
+          </div>
+          <div class="morning-context-bottom"><label class="dlc-check"><input id="morningDlcVerified" type="checkbox"><span><b>DLC vérifiés</b><small id="morningDlcMeta">À vérifier</small></span></label><button id="saveMorningContextBtn" class="btn primary" type="button">Enregistrer les informations</button></div>
+        </section>
+        <div id="taskGroups" class="task-groups"></div>
+        <div id="emptyListMessage" class="empty-state hidden"><div>✦</div><h3>Aucune tâche pour le moment</h3><p>Un manager peut ajouter les éléments de cette liste.</p></div>
+      </section>
+
+      <section id="historyView" class="view">
+        <div class="page-heading"><div><p class="eyebrow">TRAÇABILITÉ</p><h2>Historique</h2><p class="muted">Les validations et les modifications des listes.</p></div><button id="exportHistoryBtn" class="btn secondary manager-only hidden" type="button">↓ Exporter CSV</button></div>
+        <div class="history-filter"><label for="historyType">Liste</label><select id="historyType"><option value="all">Toutes les listes</option><option value="morning">Check du matin</option><option value="afternoon">Préparations après-midi</option><option value="defrost">Décongélations</option></select><label for="historyDate">Date</label><input id="historyDate" type="date"></div>
+        <div id="historyItems" class="history-items"></div>
+      </section>
+
+      <section id="managerView" class="view">
+        <div class="page-heading"><div><p class="eyebrow">ADMINISTRATION</p><h2>Espace manager</h2><p class="muted">Gérez les listes et les accès de l'équipe.</p></div><span class="manager-shield">◆</span></div>
+        <div class="manager-tabs"><button class="manager-tab active" data-manager-tab="tasks">Préparations</button><button class="manager-tab" data-manager-tab="staff">Employés</button><button class="manager-tab" data-manager-tab="qr">QR code</button></div>
+        <div id="managerTasksPanel" class="manager-panel">
+          <div class="manager-toolbar"><div><h3>Gestion des listes</h3><p class="muted">Ajouter, modifier ou désactiver des tâches.</p></div></div>
+          <label class="field-label" for="managerListSelect">Liste à modifier</label>
+          <select id="managerListSelect" class="select-large"><option value="morning">Check du matin</option><option value="afternoon">Préparations après-midi</option><option value="defrost">Décongélations</option></select>
+          <form id="addTaskForm" class="add-task-form"><input id="newTaskName" type="text" placeholder="Nom de la préparation" maxlength="90" required><input id="newTaskGroup" type="text" placeholder="Rubrique (facultatif)" maxlength="50"><button class="btn primary" type="submit">＋ Ajouter</button></form>
+          <div id="managerTaskList" class="manager-task-list"></div>
+        </div>
+        <div id="managerStaffPanel" class="manager-panel hidden">
+          <div class="manager-toolbar"><div><h3>Gestion de l'équipe</h3><p class="muted">Les profils désactivés restent dans l'historique.</p></div></div>
+          <form id="addEmployeeForm" class="staff-form"><label class="field-label" for="newEmployeeName">Nom et prénom</label><input id="newEmployeeName" name="full_name" type="text" maxlength="80" placeholder="Ex. Camille Martin" required><label class="field-label" for="newEmployeeEmail">Adresse e-mail de connexion</label><input id="newEmployeeEmail" name="email" type="email" placeholder="camille@exemple.fr" required><label class="field-label" for="newEmployeePassword">Mot de passe provisoire</label><input id="newEmployeePassword" name="password" type="password" minlength="8" placeholder="8 caractères minimum" required><button class="btn primary full" type="submit">＋ Ajouter l'employé</button></form>
+          <div id="employeeList" class="employee-list"></div>
+        </div>
+        <div id="managerQrPanel" class="manager-panel hidden"><div class="qr-card"><p class="eyebrow">ACCÈS À L'APPLICATION</p><h3>QR code de connexion</h3><p class="muted">À générer une fois l'application publiée en ligne. Les employés pourront ensuite enregistrer le site sur l'écran d'accueil de leur téléphone.</p><div id="qrCodeCanvas" class="qr-placeholder">QR</div><p id="qrLinkText" class="qr-url">L'adresse de l'application apparaîtra ici après publication.</p><button id="generateQrBtn" class="btn secondary" type="button">Générer le QR code</button><button id="printQrBtn" class="btn primary" type="button">Imprimer le QR code</button></div></div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Navigation principale">
+      <button class="nav-item active" data-view="homeView"><span>⌂</span><small>Accueil</small></button>
+      <button class="nav-item" data-go-list="morning"><span>☀</span><small>Matin</small></button>
+      <button class="nav-item" data-go-list="afternoon"><span>◷</span><small>Après-midi</small></button>
+      <button class="nav-item" data-go-list="defrost"><span>❄</span><small>Décong.</small></button>
+      <button class="nav-item" data-view="historyView"><span>↺</span><small>Historique</small></button>
+      <button class="nav-item manager-only hidden" data-view="managerView"><span>⚙</span><small>Manager</small></button>
+    </nav>
+  </div>
+  <div id="toast" class="toast" role="status"></div>
+  <dialog id="editTaskDialog" class="modal"><form id="editTaskForm" method="dialog"><div class="modal-head"><div><p class="eyebrow">MODIFIER LA TÂCHE</p><h3>Préparation</h3></div><button class="icon-btn" value="cancel" aria-label="Fermer">×</button></div><input id="editTaskId" type="hidden"><label class="field-label" for="editTaskTitle">Nom</label><input id="editTaskTitle" type="text" maxlength="90" required><label class="field-label" for="editTaskGroup">Rubrique</label><input id="editTaskGroup" type="text" maxlength="50"><label class="field-label" for="editTaskNote">Indication / quantité</label><input id="editTaskNote" type="text" maxlength="120"><div class="modal-actions"><button class="btn secondary" value="cancel">Annuler</button><button class="btn primary" id="saveTaskEdit" value="default">Enregistrer</button></div></form></dialog>
+  <script>
+/* Pokawa Kitchen — v2
+   Mode DEMO : données stockées sur cet appareil uniquement.
+   Mode EN LIGNE : Supabase Auth + PostgreSQL + Realtime, après configuration.
+*/
+(() => {
+  'use strict';
+  const $ = (selector) => document.querySelector(selector);
+  const $$ = (selector) => [...document.querySelectorAll(selector)];
+  const CONFIG = window.POKAWA_CONFIG || {};
+  const HAS_LIVE_CONFIG = Boolean(CONFIG.SUPABASE_URL && CONFIG.SUPABASE_ANON_KEY);
+  const LIVE_CONFIGURED = Boolean(HAS_LIVE_CONFIG && window.supabase?.createClient);
+  const DB = LIVE_CONFIGURED ? window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY) : null;
+  const STORE_KEY = 'pokawa-kitchen-demo-v1';
+  const TYPES = {
+    morning: { title: 'Check du matin', description: 'Inventaire et production matinée', eyebrow: 'PRODUCTION DU MATIN' },
+    afternoon: { title: 'Préparations après-midi', description: 'Préparations et quantités à réaliser', eyebrow: 'PRODUCTION APRÈS-MIDI' },
+    defrost: { title: 'Décongélations', description: 'Produits à anticiper pour J+1', eyebrow: 'SUIVI DES DÉCONGÉLATIONS' }
+  };
+  const uuid = () => (globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : `id-${Date.now()}-${Math.random().toString(16).slice(2)}`);
+  const localDayKey = (d=new Date()) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const localDate = () => localDayKey(new Date());
+  const shortDate = (date) => new Intl.DateTimeFormat('fr-FR', { weekday:'long', day:'numeric', month:'long' }).format(new Date(`${date}T12:00:00`));
+  const timeLabel = (value) => value ? new Intl.DateTimeFormat('fr-FR', {hour:'2-digit',minute:'2-digit'}).format(new Date(value)) : '';
+  const escapeHtml = (s='') => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  function seedTasks() {
+    const rows = [];
+    const add = (type, group, title, note='') => rows.push({id:uuid(), list_type:type, group_name:group, title, note, sort_order:rows.length, active:true});
+    // Reprise de la fiche photo « FICHE PRODUCTION C3 2026 DIEGO ».
+    [
+      ['Avocats (10/P bac)',''],['Mangue (5/P bac)',''],['Ananas (2/P bac)',''],['Carottes (1kg/G bac)',''],['Concombres (3/bac)',''],['Radis 1kg/bac','']
+    ].forEach(([t,n])=>add('morning','Découpe',t,n));
+    [
+      'Concombre salé','Radis bleu','Mix mangue carotte','Chou déco','Cebette Thaï','Passion BBT','Citron vert','Guacamole','Ciboulette'
+    ].forEach(t=>add('morning','Préparations complémentaires',t));
+    ['ONI SALMON (2.5/1000)','ONI THON (1.5/1000)','ONI GUACA (1.5/1000)'].forEach(t=>add('morning','Oni',t));
+    [
+      ['Riz blanc (x9kg)','800 ml vinaigre x3'],['Riz noir (x4kg)','100 ml/kg'],['Saumon (2.5kg/G bac)',''],['Thon mariné (G bac/1kg)',''],['Crevettes (1kg/M bac)','']
+    ].forEach(([t,n])=>add('morning','Riz et protéines',t,n));
+
+    // Reprise de la fiche « FICHE PREPARATIONS ET DECONGELATIONS C3 2026 ».
+    [
+      ['Poulet Teriyaki X2',''],['KATSU16 pièces',''],['AIGUILLETTES VEGGIE',''],['TARTINE',''],['CREAM CHEESE',''],['TZATZIKI',''],
+      ['THÉ GLACÉ 5L',''],['CITRONNADE 5L',''],['OLONG 5L',''],['JUS DE CITRON',''],['COOKIES',''],['EDAMAME X 6',''],['QUINOA X 6',''],['LENTILLE BELUGA',''],
+      ['BUBBLE','MP · FR'],['BOUTEILLES','CITRON · THÉ'],['COULIS','FRAM · MANGUE'],['SAUCE SATAY',''],['Sauce Massaman',''],['Sauce Piquante',''],['Sauce DIEGO',''],['Sauce Teriyaki',''],
+      ['CAROTTE RÔTIE',''],['Pois gourmands',''],['ALPRO',''],['Moelleux chocolat',''],['Cheesecake',''],['SKYR',''],['PUDDING',''],['MOCHIS','Mangue · Coco']
+    ].forEach(([t,n])=>add('afternoon','Préparations après-midi',t,n));
+    // Les lignes DECONG / STOCK du document source sont placées dans la liste dédiée.
+    ['STICKY RICE DECONG','GYOZAS LÉGUMES','GYOZA POULET','SAUMON STOCK','THON STOCK','CREVETTE STOCK','AVOCAT STOCK','MANGUE STOCK','RIZ STOCK']
+      .forEach(t=>add('defrost','Décongélations J+1',t));
+    return rows;
+  }
+
+  function freshDemo() {
+    return {
+      employees: [
+        {id:'demo-emp-1', full_name:'Employé 1', login:'employe1', password:'1234', role:'employee', active:true},
+        {id:'demo-emp-2', full_name:'Employé 2', login:'employe2', password:'1234', role:'employee', active:true}
+      ],
+      manager: {login:'manager', password:'2468'},
+      dataVersion: 2,
+      tasks: seedTasks(), completions:{}, dailyContext:{}, history:[]
+    };
+  }
+  // Déclarée avant loadDemo : évite une erreur au tout premier lancement sans données locales.
+  const saveDemo = (value = demo) => localStorage.setItem(STORE_KEY, JSON.stringify(value));
+  function loadDemo() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORE_KEY));
+      if (saved && Array.isArray(saved.tasks) && Array.isArray(saved.employees)) {
+        saved.manager ||= {login:'manager',password:'2468'};
+        saved.completions ||= {};
+        saved.dailyContext ||= {};
+        saved.history ||= [];
+        // Migration depuis le premier prototype. On conserve les validations et l'historique.
+        if ((saved.dataVersion || 1) < 2) {
+          const defrostNames=['STICKY RICE DECONG','GYOZAS LÉGUMES','GYOZA POULET','SAUMON STOCK','THON STOCK','CREVETTE STOCK','AVOCAT STOCK','MANGUE STOCK','RIZ STOCK'];
+          saved.tasks.forEach(t=>{
+            const legacyTitle=String(t.title||'').trim().toUpperCase();
+            if (legacyTitle === 'COOKIR') t.title = 'COOKIES';
+            if (legacyTitle === 'PUDDING FRAMBOISE') t.active = false;
+            if (defrostNames.includes(String(t.title||'').toUpperCase()) && t.list_type === 'afternoon') {
+              t.list_type = 'defrost'; t.group_name = 'Décongélations J+1';
+            }
+          });
+          const existing = new Set(saved.tasks.filter(t=>t.list_type==='defrost').map(t=>String(t.title||'').toUpperCase()));
+          seedTasks().filter(t=>t.list_type==='defrost' && !existing.has(t.title.toUpperCase())).forEach(t=>saved.tasks.push(t));
+          saved.dataVersion = 2;
+          saveDemo(saved);
+        }
+        return saved;
+      }
+    } catch (_) {}
+    const initial = freshDemo(); saveDemo(initial); return initial;
+  }
+  let demo = HAS_LIVE_CONFIG ? null : loadDemo();
+  let dailyContext = {};
+  let morningContextDraft = {};
+  const taskDrafts = new Map();
+  let user = null;
+  let currentType = 'morning';
+  let tasks = [];
+  let completions = [];
+  let employees = [];
+  let history = [];
+  let realtimeChannel = null;
+  let currentView = 'homeView';
+  let toastTimer = null;
+
+  const actorName = () => user?.full_name || 'Équipe';
+  const completionKey = (date, taskId) => `${date}::${taskId}`;
+  const showToast = (message) => {
+    const el = $('#toast'); el.textContent = message; el.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(()=>el.classList.remove('show'), 2600);
+  };
+  const setLoginError = (message='') => { $('#loginError').textContent = message; };
+  const setSync = (online) => {
+    const pill = $('#syncPill'); pill.classList.toggle('online', online);
+    pill.innerHTML = online ? '<i></i> Synchronisé' : LIVE_CONFIGURED ? '<i></i> Connexion…' : '<i></i> Démo locale';
+  };
+
+  function switchLoginTab(tab) {
+    $$('.login-tab').forEach(b=>b.classList.toggle('active',b.dataset.loginTab===tab));
+    $('#employeeLoginForm').classList.toggle('hidden',tab!=='employee');
+    $('#managerLoginForm').classList.toggle('hidden',tab!=='manager');
+    setLoginError('');
+  }
+  function switchView(viewId) {
+    currentView = viewId;
+    $$('.view').forEach(v=>v.classList.toggle('active',v.id===viewId));
+    $$('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.view===viewId || (viewId==='checklistView' && b.dataset.goList===currentType)));
+    if (viewId==='homeView') renderHome();
+    if (viewId==='checklistView') renderChecklist();
+    if (viewId==='historyView') renderHistory();
+    if (viewId==='managerView') { renderManagerTasks(); renderEmployees(); }
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function showApp() {
+    $('#loginScreen').classList.add('hidden'); $('#appShell').classList.remove('hidden');
+    $('#welcomeName').textContent = actorName().split(' ')[0];
+    $('#headerSubtitle').textContent = user?.role==='manager' ? 'Cagnes-sur-Mer · Manager' : 'Cagnes-sur-Mer · Cuisine';
+    $$('.manager-only').forEach(el=>el.classList.toggle('hidden',user?.role!=='manager'));
+    setSync(false);
+    switchView('homeView');
+  }
+  function showLogin() {
+    $('#appShell').classList.add('hidden'); $('#loginScreen').classList.remove('hidden');
+    if (realtimeChannel && DB) DB.removeChannel(realtimeChannel);
+    realtimeChannel = null; user = null; morningContextDraft = {}; taskDrafts.clear();
+    $('#employeePassword').value=''; $('#managerPassword').value=''; setLoginError('');
+  }
+  function logDemo(action, listType, title, extra={}) {
+    demo.history.unshift({id:uuid(), created_at:new Date().toISOString(), actor_name:actorName(), action, list_type:listType, title, ...extra});
+    demo.history = demo.history.slice(0,1500); saveDemo();
+  }
+  function profileName(id) {
+    return employees.find(e=>e.id===id)?.full_name || (demo?.employees.find(e=>e.id===id)?.full_name) || 'Équipe';
+  }
+  function currentCompletion(taskId) {
+    if (LIVE_CONFIGURED) return completions.find(c=>c.task_id===taskId && c.work_date===localDate()) || null;
+    return demo.completions[completionKey(localDate(),taskId)] || null;
+  }
+  function fieldsForType(type) {
+    if (type==='morning') return [['inventory_value','Inventaire'],['production_value','Production matinée'],['afternoon_point_value','Point après-midi']];
+    if (type==='afternoon') return [['inventory_value','Inv'],['quantity_value','Quantité en bac']];
+    return [['quantity_value','Quantité'],['entry_note','Observation']];
+  }
+
+  async function loginDemo(form, role) {
+    const data = new FormData(form); const login=(data.get(role==='manager'?'managerEmail':'employeeEmail')||'').toString().trim().toLowerCase();
+    const pass=(data.get(role==='manager'?'managerPassword':'employeePassword')||'').toString();
+    if (role==='manager') {
+      if (login===demo.manager.login && pass===demo.manager.password) user={id:'demo-manager',full_name:'Manager',role:'manager',mode:'demo'};
+      else throw new Error('Identifiant ou code manager incorrect. Démo : manager / 2468.');
+    } else {
+      const found=demo.employees.find(e=>e.active && (e.login.toLowerCase()===login || e.full_name.toLowerCase()===login));
+      if (!found || found.password!==pass) throw new Error('Identifiant ou code employé incorrect. Démo : employe1 / 1234 ou employe2 / 1234.');
+      user={id:found.id,full_name:found.full_name,role:'employee',mode:'demo'};
+    }
+    employees=demo.employees.map(e=>({...e})); tasks=demo.tasks; completions=Object.values(demo.completions); history=demo.history; dailyContext=demo.dailyContext[localDate()]||{};
+    showApp();
+  }
+
+  async function loginLive(form) {
+    const data = new FormData(form);
+    const email=(data.get(form.id==='managerLoginForm'?'managerEmail':'employeeEmail')||'').toString().trim();
+    const password=(data.get(form.id==='managerLoginForm'?'managerPassword':'employeePassword')||'').toString();
+    const {data:authData,error}=await DB.auth.signInWithPassword({email,password});
+    if (error) throw error;
+    const {data:profile,error:profileError}=await DB.from('profiles').select('id,full_name,role,active').eq('id',authData.user.id).single();
+    if (profileError || !profile || !profile.active) { await DB.auth.signOut(); throw new Error('Compte non activé. Contacte un manager.'); }
+    if (form.id==='managerLoginForm' && profile.role!=='manager') { await DB.auth.signOut(); throw new Error('Ce compte ne possède pas les droits manager.'); }
+    user={id:profile.id,full_name:profile.full_name,role:profile.role,mode:'live'};
+    await loadLiveData(); setupRealtime(); showApp();
+  }
+
+  async function loadLiveData() {
+    const date=localDate();
+    const [taskRes,completionRes,employeeRes,contextRes]=await Promise.all([
+      DB.from('checklist_tasks').select('*').order('list_type').order('sort_order'),
+      DB.from('checklist_completions').select('*').eq('work_date',date),
+      DB.from('profiles').select('id,full_name,email,role,active,created_at').order('full_name'),
+      DB.from('daily_context').select('*').eq('work_date',date).maybeSingle()
+    ]);
+    if (taskRes.error) throw taskRes.error;
+    if (completionRes.error) throw completionRes.error;
+    if (employeeRes.error) throw employeeRes.error;
+    if (contextRes.error) throw contextRes.error;
+    tasks=taskRes.data||[]; completions=completionRes.data||[]; employees=employeeRes.data||[]; dailyContext=contextRes.data||{};
+  }
+  function setupRealtime() {
+    if (!DB) return;
+    if (realtimeChannel) DB.removeChannel(realtimeChannel);
+    realtimeChannel=DB.channel('pokawa-live-board')
+      .on('postgres_changes',{event:'*',schema:'public',table:'checklist_tasks'},async()=>{await loadLiveData();refreshVisible();})
+      .on('postgres_changes',{event:'*',schema:'public',table:'checklist_completions'},async()=>{await loadLiveData();refreshVisible();})
+      .on('postgres_changes',{event:'*',schema:'public',table:'daily_context'},async()=>{await loadLiveData();refreshVisible();})
+      .on('postgres_changes',{event:'*',schema:'public',table:'profiles'},async()=>{await loadLiveData();const me=employees.find(e=>e.id===user?.id);if(!me?.active){await DB.auth.signOut();showLogin();setLoginError('Votre compte a été désactivé. Contactez un manager.');return;}refreshVisible();})
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'audit_events'},()=>{if(currentView==='historyView')renderHistory();})
+      .subscribe(status=>{ setSync(status==='SUBSCRIBED'); });
+  }
+  function refreshVisible() {
+    if (currentView==='homeView') renderHome();
+    if (currentView==='checklistView') renderChecklist();
+    if (currentView==='historyView') renderHistory();
+    if (currentView==='managerView') {renderManagerTasks();renderEmployees();}
+  }
+
+  function listTasks(type, includeInactive=false) {
+    return tasks.filter(t=>t.list_type===type && (includeInactive || t.active!==false)).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
+  }
+  function getDone(task) {
+    const record=currentCompletion(task.id);
+    return record?.completed ? record : null;
+  }
+  function countType(type) {
+    const all=listTasks(type); const done=all.filter(t=>getDone(t)); return {all:all.length,done:done.length,percent:all.length?Math.round(done.length/all.length*100):0};
+  }
+  function renderHome() {
+    const date=localDate(); $('#todayLabel').textContent=shortDate(date).toLocaleUpperCase('fr-FR'); $('#dateChip').textContent=shortDate(date);
+    const values=[['morning','morningProgress','morningPercent','launchMorning'],['afternoon','afternoonProgress','afternoonPercent','launchAfternoon'],['defrost','defrostProgress','defrostPercent','launchDefrost']];
+    values.forEach(([type,countId,pctId,launchId])=>{
+      const c=countType(type); $('#'+countId).textContent=`${c.done}/${c.all}`; $('#'+pctId).textContent=c.all?`${c.percent}% terminé`:'À compléter'; $('#'+launchId).textContent=c.all?`${c.done}/${c.all}`:'—';
+    });
+  }
+  function renderChecklist() {
+    const conf=TYPES[currentType]; $('#listTitle').textContent=conf.title;
+    $('#listDescription').textContent=currentType==='morning'?'Renseignez inventaire, production et point après-midi, puis cochez la tâche.':currentType==='afternoon'?'Renseignez l’inventaire et la quantité en bac, puis cochez la préparation.':'Renseignez la quantité ou une observation, puis cochez la décongélation.';
+    $('#listEyebrow').textContent=conf.eyebrow; $('#listDateSmall').textContent=`Journée du ${shortDate(localDate())}`;
+    const contextCard=$('#morningContextCard');
+    contextCard.classList.toggle('hidden',currentType!=='morning');
+    if(currentType==='morning'){
+      const ctx=dailyContext||{};
+      $('#morningContextDate').textContent=shortDate(localDate());
+      $('#morningEvent').value=morningContextDraft.event ?? ctx.event ?? '';
+      $('#morningTemperature').value=morningContextDraft.temperature ?? ctx.temperature ?? '';
+      $('#morningWeather').value=morningContextDraft.weather ?? ctx.weather ?? '';
+      $('#morningForecastCa').value=morningContextDraft.forecast_ca ?? ctx.forecast_ca ?? '';
+      $('#morningDlcVerified').checked=Boolean(morningContextDraft.dlc_verified ?? ctx.dlc_verified);
+      const verifier=LIVE_CONFIGURED?profileName(ctx.dlc_verified_by):(ctx.dlc_verified_by_name||'un membre de l’équipe');
+      $('#morningDlcMeta').textContent=ctx.dlc_verified?`Vérifié par ${verifier} · ${timeLabel(ctx.dlc_verified_at)}`:'À vérifier';
+    }
+    const all=listTasks(currentType); const done=all.filter(t=>getDone(t)); const pct=all.length?Math.round(done.length/all.length*100):0;
+    $('#listProgressCount').textContent=`${done.length} sur ${all.length}`; $('#listProgressPercent').textContent=`${pct} %`; $('#listProgressBar').style.width=`${pct}%`;
+    $('#emptyListMessage').classList.toggle('hidden',all.length!==0);
+    const groups=new Map(); all.forEach(t=>{const g=t.group_name||'À préparer'; if(!groups.has(g))groups.set(g,[]); groups.get(g).push(t);});
+    $('#taskGroups').innerHTML=[...groups.entries()].map(([group,items])=>{
+      const groupDone=items.filter(t=>getDone(t)).length;
+      return `<article class="task-group"><div class="group-heading"><h3>${escapeHtml(group)}</h3><span>${groupDone}/${items.length}</span></div>${items.map(t=>{
+        const record=currentCompletion(t.id); const c=record?.completed?record:null;
+        const who=c?(LIVE_CONFIGURED?profileName(c.completed_by):c.actor_name):''; const at=c?.completed_at||c?.updated_at;
+        const blocked=c && user.role!=='manager' && c.completed_by!==user.id;
+        const draft=taskDrafts.get(t.id)||{};
+        const fields=fieldsForType(currentType).map(([key,label])=>`<label class="task-field"><span>${escapeHtml(label)}</span><input type="text" inputmode="text" maxlength="50" data-task-field="${key}" value="${escapeHtml(draft[key] ?? record?.[key] ?? '')}" ${blocked?'disabled':''} aria-label="${escapeHtml(label)} pour ${escapeHtml(t.title)}"></label>`).join('');
+        return `<div class="task-row ${c?'done':''}" data-task-row="${escapeHtml(t.id)}"><button class="task-check" data-toggle-task="${escapeHtml(t.id)}" aria-label="${c?'Décocher':'Valider'} ${escapeHtml(t.title)}" ${blocked?'disabled':''}></button><div class="task-main"><span class="task-title">${escapeHtml(t.title)}</span>${t.note?`<span class="task-note">${escapeHtml(t.note)}</span>`:''}<div class="task-fields">${fields}</div></div><div class="task-meta">${c?`<b>${escapeHtml(who||'Réalisé')}</b><small>${escapeHtml(timeLabel(at))}</small>`:'<small>À faire</small>'}</div></div>`;
+      }).join('')}</article>`;
+    }).join('');
+  }
+
+  async function saveMorningContext() {
+    if(!user) return;
+    const payload={
+      event:$('#morningEvent').value.trim()||null,
+      temperature:$('#morningTemperature').value.trim()||null,
+      weather:$('#morningWeather').value.trim()||null,
+      forecast_ca:$('#morningForecastCa').value.trim()||null,
+      dlc_verified:$('#morningDlcVerified').checked
+    };
+    try {
+      if(LIVE_CONFIGURED){
+        const {error}=await DB.from('daily_context').upsert({work_date:localDate(),...payload,changed_by:user.id},{onConflict:'work_date'});
+        if(error) throw error;
+        await loadLiveData();
+      } else {
+        const previous=demo.dailyContext[localDate()]||{};
+        demo.dailyContext[localDate()]={...previous,...payload,changed_by:user.id,updated_at:new Date().toISOString(),
+          dlc_verified_by_name:payload.dlc_verified?actorName():null,dlc_verified_at:payload.dlc_verified?new Date().toISOString():null};
+        dailyContext=demo.dailyContext[localDate()];
+        logDemo('Mise à jour des informations du jour','morning','Informations du jour',{description:'Événement, météo, température, CA prévu ou vérification DLC'});
+        saveDemo();
+      }
+      morningContextDraft={}; renderChecklist(); showToast('Informations du matin enregistrées.');
+    } catch(err) { showToast(`Enregistrement impossible : ${err.message||err}`); }
+  }
+
+  async function toggleTask(taskId) {
+    const task=tasks.find(t=>t.id===taskId); if(!task)return;
+    const existing=getDone(task); const existingRecord=currentCompletion(taskId); const checked=!existing;
+    if (existing && user.role!=='manager' && existing.completed_by && existing.completed_by!==user.id) {
+      showToast('Seul un manager peut modifier la validation d’un collègue.');return;
+    }
+    try {
+      const row=$(`[data-task-row="${taskId}"]`);
+      const values={};
+      fieldsForType(currentType).forEach(([key])=>{values[key]=row?.querySelector(`[data-task-field="${key}"]`)?.value?.trim()||null;});
+      if (LIVE_CONFIGURED) {
+        const payload={
+          work_date:localDate(),task_id:taskId,completed:checked,
+          completed_by:checked?user.id:null,
+          completed_at:checked?new Date().toISOString():null,
+          changed_by:user.id,title_snapshot:task.title,
+          inventory_value:values.inventory_value,
+          production_value:values.production_value,
+          afternoon_point_value:values.afternoon_point_value,
+          quantity_value:values.quantity_value,
+          entry_note:values.entry_note
+        };
+        const {error}=await DB.from('checklist_completions').upsert(payload,{onConflict:'work_date,task_id'}); if(error)throw error;
+        await loadLiveData();
+      } else {
+        const key=completionKey(localDate(),taskId);
+        const base=existingRecord||{work_date:localDate(),task_id:taskId,title_snapshot:task.title};
+        if(checked){
+          demo.completions[key]={...base,...values,completed:true,completed_by:user.id,actor_name:actorName(),completed_at:new Date().toISOString(),title_snapshot:task.title};
+        } else {
+          demo.completions[key]={...base,...values,completed:false,completed_by:null,completed_at:null,last_changed_by:user.id};
+        }
+        logDemo(checked?'Validation':'Réouverture',currentType,task.title,{task_id:taskId,fields:values});
+        completions=Object.values(demo.completions); saveDemo();
+      }
+      taskDrafts.delete(taskId);
+      renderChecklist(); renderHome();
+      showToast(checked?'Préparation validée et enregistrée.':'Préparation remise à faire.');
+    } catch(err) { showToast(`Enregistrement impossible : ${err.message||err}`); }
+  }
+
+  async function renderHistory() {
+    const type=$('#historyType').value; const date=$('#historyDate').value;
+    if(LIVE_CONFIGURED){
+      let data=[]; let offset=0;
+      while(true){
+        const {data:page,error}=await DB.from('audit_events').select('id,created_at,actor_id,event_type,entity_type,entity_id,details').order('created_at',{ascending:false}).range(offset,offset+999);
+        if(error){$('#historyItems').innerHTML=`<div class="empty-state"><p>${escapeHtml(error.message)}</p></div>`;return;}
+        data=data.concat(page||[]); if(!page||page.length<1000)break; offset+=1000;
+      }
+      const actorMap=new Map(employees.map(e=>[e.id,e.full_name]));
+      history=data.map(e=>({id:e.id,created_at:e.created_at,actor_name:actorMap.get(e.actor_id)||'Utilisateur',action:e.event_type,title:e.details?.title||e.details?.new_title||e.details?.old_title||e.details?.name||e.entity_type,list_type:e.details?.list_type||'',details:e.details||{}}));
+    } else history=demo.history;
+    const filtered=history.filter(e=>(type==='all'||e.list_type===type)&&(!date||localDayKey(new Date(e.created_at))===date));
+    $('#historyItems').innerHTML=filtered.length?filtered.map(e=>{
+      const verb=e.action==='Validation'||e.action==='task_completed'?'a validé':e.action==='Réouverture'||e.action==='task_reopened'?'a rouvert':e.action==='task_added'?'a ajouté':e.action==='task_updated'?'a modifié':e.action==='task_deactivated'?'a désactivé':e.action==='task_reactivated'?'a réactivé':e.action==='employee_updated'?'a modifié le profil de':e.action==='employee_added'?'a ajouté l’employé':e.action==='employee_deactivated'?'a désactivé le compte de':e.action==='employee_reactivated'?'a réactivé le compte de':e.action==='daily_context_updated'?'a mis à jour':'a effectué une action sur';
+      const name=e.title||e.details?.name||'un élément';
+      return `<article class="history-entry"><i class="history-dot"></i><div><strong>${escapeHtml(e.actor_name)} ${verb} : ${escapeHtml(name)}</strong><p>${escapeHtml(TYPES[e.list_type]?.title||'Administration')} · ${escapeHtml(e.details?.description||'Action enregistrée')}</p></div><time>${escapeHtml(timeLabel(e.created_at))}</time></article>`;
+    }).join(''):`<div class="empty-state"><div>↺</div><h3>Aucune activité trouvée</h3><p>Les validations apparaîtront ici au fur et à mesure.</p></div>`;
+  }
+
+  function renderManagerTasks() {
+    if(user?.role!=='manager')return;
+    const type=$('#managerListSelect').value; const rows=listTasks(type,true);
+    $('#managerTaskList').innerHTML=rows.length?rows.map(t=>`<div class="manager-task ${t.active===false?'inactive':''}"><div><strong>${escapeHtml(t.title)} ${t.active===false?'<small>(désactivée)</small>':''}</strong><small>${escapeHtml(t.group_name||'Sans rubrique')}${t.note?` · ${escapeHtml(t.note)}`:''}</small></div><button data-edit-task="${escapeHtml(t.id)}">Modifier</button>${t.active===false?`<button data-reactivate-task="${escapeHtml(t.id)}">Réactiver</button>`:`<button class="danger" data-deactivate-task="${escapeHtml(t.id)}">Désactiver</button>`}</div>`).join(''):`<div class="empty-state"><h3>Liste vide</h3><p>Ajoutez les premières préparations ci-dessus.</p></div>`;
+  }
+  function renderEmployees() {
+    if(user?.role!=='manager')return;
+    const list=LIVE_CONFIGURED?employees:demo.employees;
+    $('#employeeList').innerHTML=list.length?list.map(e=>`<div class="employee-item ${e.active===false?'inactive':''}"><div class="avatar">${escapeHtml((e.full_name||'?').split(/\s+/).map(p=>p[0]).join('').slice(0,2).toUpperCase())}</div><div><strong>${escapeHtml(e.full_name)} ${e.active===false?'<small>(désactivé)</small>':''}</strong><small>${escapeHtml(e.email||e.login||'Compte équipe')} · ${escapeHtml(e.role||'employee')}</small></div>${e.role==='manager'?'<span class="muted">Manager</span>':e.active===false?'<button data-reactivate-employee="'+escapeHtml(e.id)+'">Réactiver</button>':'<button class="danger" data-deactivate-employee="'+escapeHtml(e.id)+'">Désactiver</button>'}</div>`).join(''):`<div class="empty-state"><p>Aucun employé enregistré.</p></div>`;
+  }
+
+  async function addTask(event) {
+    event.preventDefault(); const title=$('#newTaskName').value.trim(); const group=$('#newTaskGroup').value.trim(); if(!title)return;
+    try {
+      if(LIVE_CONFIGURED){const {error}=await DB.from('checklist_tasks').insert({list_type:$('#managerListSelect').value,title,group_name:group||null,note:null,sort_order:listTasks($('#managerListSelect').value,true).length,active:true,created_by:user.id});if(error)throw error;await loadLiveData();}
+      else {demo.tasks.push({id:uuid(),list_type:$('#managerListSelect').value,title,group_name:group||'À préparer',note:'',sort_order:demo.tasks.length,active:true});logDemo('Ajout de préparation',$('#managerListSelect').value,title);tasks=demo.tasks;saveDemo();}
+      $('#newTaskName').value='';$('#newTaskGroup').value='';renderManagerTasks();renderChecklist();renderHome();showToast('Préparation ajoutée.');
+    }catch(err){showToast(`Ajout impossible : ${err.message||err}`);}
+  }
+  function openEditTask(taskId) {
+    const t=tasks.find(x=>x.id===taskId);if(!t)return;
+    $('#editTaskId').value=t.id;$('#editTaskTitle').value=t.title;$('#editTaskGroup').value=t.group_name||'';$('#editTaskNote').value=t.note||'';$('#editTaskDialog').showModal();
+  }
+  async function saveEditTask(event) {
+    event.preventDefault(); const id=$('#editTaskId').value; const title=$('#editTaskTitle').value.trim(); const group=$('#editTaskGroup').value.trim(); const note=$('#editTaskNote').value.trim();
+    try{
+      if(LIVE_CONFIGURED){const {error}=await DB.from('checklist_tasks').update({title,group_name:group||null,note:note||null,updated_by:user.id}).eq('id',id);if(error)throw error;await loadLiveData();}
+      else {const t=demo.tasks.find(x=>x.id===id);if(t){t.title=title;t.group_name=group||'À préparer';t.note=note;logDemo('Modification de préparation',t.list_type,title,{description:'Intitulé ou indication modifié'});saveDemo();tasks=demo.tasks;}}
+      $('#editTaskDialog').close();renderManagerTasks();renderChecklist();showToast('Modifications enregistrées.');
+    }catch(err){showToast(`Modification impossible : ${err.message||err}`);}
+  }
+  async function setTaskActive(id,active) {
+    const t=tasks.find(x=>x.id===id);if(!t)return;
+    try{
+      if(LIVE_CONFIGURED){const {error}=await DB.from('checklist_tasks').update({active,updated_by:user.id}).eq('id',id);if(error)throw error;await loadLiveData();}
+      else {t.active=active;logDemo(active?'Réactivation de préparation':'Désactivation de préparation',t.list_type,t.title);saveDemo();tasks=demo.tasks;}
+      renderManagerTasks();renderChecklist();renderHome();showToast(active?'Préparation réactivée.':'Préparation désactivée. L’historique est conservé.');
+    }catch(err){showToast(`Action impossible : ${err.message||err}`);}
+  }
+
+  async function addEmployee(event) {
+    event.preventDefault();const full_name=$('#newEmployeeName').value.trim();const email=$('#newEmployeeEmail').value.trim().toLowerCase();const password=$('#newEmployeePassword').value;
+    if(password.length<8){showToast('Le mot de passe doit contenir au moins 8 caractères.');return;}
+    try{
+      if(LIVE_CONFIGURED){const {data,error}=await DB.functions.invoke('admin-create-employee',{body:{full_name,email,password}});if(error)throw error;if(data?.error)throw new Error(data.error);await loadLiveData();}
+      else {if(demo.employees.some(e=>e.login.toLowerCase()===email||e.email?.toLowerCase()===email))throw new Error('Cet identifiant existe déjà.');demo.employees.push({id:uuid(),full_name,email,login:email,password,role:'employee',active:true});logDemo('Ajout d’employé','',full_name);saveDemo();employees=demo.employees;}
+      $('#addEmployeeForm').reset();renderEmployees();showToast('Employé ajouté. Communique-lui ses identifiants en privé.');
+    }catch(err){showToast(`Création impossible : ${err.message||err}`);}
+  }
+  async function setEmployeeActive(id,active) {
+    try{
+      if(LIVE_CONFIGURED){const {error}=await DB.from('profiles').update({active}).eq('id',id);if(error)throw error;await loadLiveData();}
+      else {const e=demo.employees.find(x=>x.id===id);if(e){e.active=active;logDemo(active?'Réactivation employé':'Désactivation employé','',e.full_name);saveDemo();employees=demo.employees;}}
+      renderEmployees();showToast(active?'Employé réactivé.':'Employé désactivé. Ses anciennes validations sont conservées.');
+    }catch(err){showToast(`Action impossible : ${err.message||err}`);}
+  }
+
+  function exportHistoryCsv() {
+    if(user?.role!=='manager'){showToast('Export réservé aux managers.');return;}
+    const rows=history.map(e=>[localDayKey(new Date(e.created_at)),timeLabel(e.created_at),TYPES[e.list_type]?.title||'Administration',e.actor_name,e.action,e.title,e.details?.description||'']);
+    const quote=v=>'\"'+String(v??'').replace(/\"/g,'\"\"')+'\"';
+    const csv='\uFEFF'+[['Date','Heure','Liste','Personne','Action','Élément','Détail'],...rows].map(r=>r.map(quote).join(';')).join('\r\n');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`pokawa-historique-${localDate()}.csv`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);showToast('Historique exporté.');
+  }
+
+  function managerTab(name) {
+    $$('.manager-tab').forEach(b=>b.classList.toggle('active',b.dataset.managerTab===name));
+    $('#managerTasksPanel').classList.toggle('hidden',name!=='tasks');$('#managerStaffPanel').classList.toggle('hidden',name!=='staff');$('#managerQrPanel').classList.toggle('hidden',name!=='qr');
+  }
+  function makeQr() {
+    const root=$('#qrCodeCanvas');root.innerHTML='';
+    if(location.protocol==='file:' || location.hostname==='localhost' || location.hostname==='127.0.0.1'){root.textContent='Publier d’abord';$('#qrLinkText').textContent='Le QR code sera généré après la publication en ligne.';showToast('Le QR code sera disponible après publication.');return;}
+    if(!window.QRCode){root.textContent='QR';showToast('Le générateur QR n’est pas disponible.');return;}
+    new QRCode(root,{text:location.href.split('#')[0],width:180,height:180,colorDark:'#173b31',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
+    $('#qrLinkText').textContent=location.href.split('#')[0];
+    showToast('QR code généré.');
+  }
+
+  // Events
+  $$('.login-tab').forEach(b=>b.addEventListener('click',()=>switchLoginTab(b.dataset.loginTab)));
+  $('#employeeLoginForm').addEventListener('submit',async e=>{e.preventDefault();setLoginError('');try{LIVE_CONFIGURED?await loginLive(e.currentTarget):await loginDemo(e.currentTarget,'employee');}catch(err){setLoginError(err.message||'Connexion impossible.');}});
+  $('#managerLoginForm').addEventListener('submit',async e=>{e.preventDefault();setLoginError('');try{LIVE_CONFIGURED?await loginLive(e.currentTarget):await loginDemo(e.currentTarget,'manager');}catch(err){setLoginError(err.message||'Connexion impossible.');}});
+  $('#logoutBtn').addEventListener('click',async()=>{if(LIVE_CONFIGURED)await DB.auth.signOut();showLogin();});
+  $$('[data-view]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));
+  $$('[data-go-list]').forEach(b=>b.addEventListener('click',()=>{currentType=b.dataset.goList;switchView('checklistView');}));
+  $$('[data-go-home]').forEach(b=>b.addEventListener('click',()=>switchView('homeView')));
+  $('#taskGroups').addEventListener('click',e=>{const b=e.target.closest('[data-toggle-task]');if(b)toggleTask(b.dataset.toggleTask);});
+  $('#taskGroups').addEventListener('input',e=>{const input=e.target.closest('[data-task-field]');if(!input)return;const row=input.closest('[data-task-row]');if(!row)return;const draft=taskDrafts.get(row.dataset.taskRow)||{};draft[input.dataset.taskField]=input.value;taskDrafts.set(row.dataset.taskRow,draft);});
+  [['morningEvent','event'],['morningTemperature','temperature'],['morningWeather','weather'],['morningForecastCa','forecast_ca']].forEach(([id,key])=>$('#'+id).addEventListener('input',e=>{morningContextDraft[key]=e.target.value;}));
+  $('#morningDlcVerified').addEventListener('change',e=>{morningContextDraft.dlc_verified=e.target.checked;});
+  $('#saveMorningContextBtn').addEventListener('click',saveMorningContext);
+  $('#historyType').addEventListener('change',renderHistory);$('#historyDate').addEventListener('change',renderHistory);$('#exportHistoryBtn').addEventListener('click',exportHistoryCsv);
+  $('#managerListSelect').addEventListener('change',renderManagerTasks);
+  $('#addTaskForm').addEventListener('submit',addTask);$('#editTaskForm').addEventListener('submit',saveEditTask);
+  $('#managerTaskList').addEventListener('click',e=>{const edit=e.target.closest('[data-edit-task]');const deactivate=e.target.closest('[data-deactivate-task]');const activate=e.target.closest('[data-reactivate-task]');if(edit)openEditTask(edit.dataset.editTask);if(deactivate)setTaskActive(deactivate.dataset.deactivateTask,false);if(activate)setTaskActive(activate.dataset.reactivateTask,true);});
+  $('#addEmployeeForm').addEventListener('submit',addEmployee);
+  $('#employeeList').addEventListener('click',e=>{const de=e.target.closest('[data-deactivate-employee]');const ac=e.target.closest('[data-reactivate-employee]');if(de)setEmployeeActive(de.dataset.deactivateEmployee,false);if(ac)setEmployeeActive(ac.dataset.reactivateEmployee,true);});
+  $$('.manager-tab').forEach(b=>b.addEventListener('click',()=>managerTab(b.dataset.managerTab)));
+  $('#generateQrBtn').addEventListener('click',makeQr);$('#printQrBtn').addEventListener('click',()=>{makeQr();setTimeout(()=>window.print(),400);});
+
+  // Initial screen / explain demo versus connected deployment.
+  if(LIVE_CONFIGURED){
+    document.querySelector('label[for="employeeEmail"]').textContent='Adresse e-mail';
+    document.querySelector('label[for="managerEmail"]').textContent='Adresse e-mail manager';
+    $('#modeNotice').className='mode-notice live';$('#modeNotice').textContent='Mode connecté prêt. Les comptes employés et managers doivent être créés dans votre espace de gestion.';
+    DB.auth.getSession().then(async({data})=>{if(data.session){try{const {data:p}=await DB.from('profiles').select('id,full_name,role,active').eq('id',data.session.user.id).single();if(p?.active){user={...p,mode:'live'};await loadLiveData();setupRealtime();showApp();}}catch(_){}}});
+  } else if(HAS_LIVE_CONFIG){
+    $('#modeNotice').className='mode-notice';
+    $('#modeNotice').textContent='La configuration en ligne est renseignée, mais le module de connexion ne s’est pas chargé. Vérifiez la connexion Internet puis rechargez la page. Les données locales ne seront pas utilisées.';
+    $('#employeeLoginForm button[type="submit"]').disabled=true;
+    $('#managerLoginForm button[type="submit"]').disabled=true;
+  } else {
+    document.querySelector('label[for="employeeEmail"]').textContent='Identifiant employé';
+    document.querySelector('label[for="managerEmail"]').textContent='Identifiant manager';
+    $('#modeNotice').className='mode-notice';$('#modeNotice').innerHTML='<strong>Mode démonstration local.</strong><br>Employé : <b>employe1</b> / <b>1234</b> · Manager : <b>manager</b> / <b>2468</b>. Les données restent sur cet appareil et ne sont pas partagées.';
+    $('#employeeEmail').placeholder='employe1';$('#managerEmail').placeholder='manager';
+  }
+  if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+})();
+
+  </script>
+</body>
+</html>
