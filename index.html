@@ -254,7 +254,7 @@
         {id:'demo-emp-2', full_name:'Employé 2', login:'employe2', password:'1234', role:'employee', active:true}
       ],
       manager: {login:'manager', password:'2468'},
-      dataVersion: 7,
+      dataVersion: 8,
       tasks: seedTasks(), completions:{}, dailyContext:{}, history:[]
     };
   }
@@ -350,6 +350,14 @@
             if(t.list_type==='morning'&&String(t.title||'').trim().toUpperCase()==='CREVETTES (1KG/M BAC)') t.active=false;
           });
           saved.dataVersion=7;
+          saveDemo(saved);
+        }
+        if ((saved.dataVersion || 1) < 8) {
+          saved.tasks.forEach(t=>{
+            const title=String(t.title||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toUpperCase().replace(/\\s+/g,' ').trim();
+            if(t.list_type==='morning' && title.startsWith('CREVETTES') && title.includes('1KG')) t.active=false;
+          });
+          saved.dataVersion=8;
           saveDemo(saved);
         }
         return saved;
