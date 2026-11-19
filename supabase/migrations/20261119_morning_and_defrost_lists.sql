@@ -45,6 +45,15 @@ update public.checklist_tasks
 set active = false
 where list_type='defrost' and active=true;
 
+-- Réactive les produits souhaités déjà présents (migration relançable).
+update public.checklist_tasks t
+set active=true, group_name='Décongélations J+1'
+where t.list_type='defrost'
+  and lower(trim(t.title)) in (
+    'edamame','lentilles beluga','katsu','poulet teriyaki',
+    'sauce massaman','sauce teriyaki','coulis mangue','coulis framboise'
+  );
+
 insert into public.checklist_tasks
   (list_type, group_name, title, note, sort_order, active)
 select 'defrost','Décongélations J+1',v.title,'',v.sort_order,true
