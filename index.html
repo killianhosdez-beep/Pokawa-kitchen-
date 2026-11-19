@@ -290,10 +290,11 @@
             const title=String(t.title||'').trim().toUpperCase();
             if(t.list_type==='defrost' && removeFromDefrost.includes(title)) t.active=false;
           });
+          const existingTuna=saved.tasks.find(t=>t.list_type==='morning'&&String(t.title||'').trim().toUpperCase()==='THON MARINÉ (G BAC/1KG)');
+          if(existingTuna){existingTuna.title='Marinade thon';existingTuna.group_name='Marinades';existingTuna.note='Après décongélation';}
           const existingMorning=new Set(saved.tasks.filter(t=>t.list_type==='morning').map(t=>String(t.title||'').trim().toUpperCase()));
           const additions=[
             ['Marinade saumon','Après la découpe du saumon'],
-            ['Marinade thon','Après décongélation'],
             ['Marinade crevettes','Après décongélation']
           ];
           additions.forEach(([title,note],i)=>{
