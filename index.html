@@ -302,7 +302,7 @@
   }
   function fieldsForType(type) {
     if (type==='morning') return [['inventory_value','Inventaire'],['production_value','Production matinée'],['afternoon_point_value','Point après-midi']];
-    if (type==='afternoon') return [['inventory_value','Inv'],['quantity_value','Quantité en bac']];
+    if (type==='afternoon') return [['inventory_value','Inv'],['quantity_value','Quantité à produire']];
     return [['quantity_value','Quantité'],['entry_note','Observation']];
   }
 
@@ -385,7 +385,7 @@
   }
   function renderChecklist() {
     const conf=TYPES[currentType]; $('#listTitle').textContent=conf.title;
-    $('#listDescription').textContent=currentType==='morning'?'Renseignez inventaire, production et point après-midi, puis cochez la tâche.':currentType==='afternoon'?'Renseignez l’inventaire et la quantité en bac, puis cochez la préparation.':'Renseignez la quantité ou une observation, puis cochez la décongélation.';
+    $('#listDescription').textContent=currentType==='morning'?'Renseignez inventaire, production et point après-midi, puis cochez la tâche.':currentType==='afternoon'?'Renseignez l’inventaire et la quantité à produire, puis cochez la préparation.':'Renseignez la quantité ou une observation, puis cochez la décongélation.';
     $('#listEyebrow').textContent=conf.eyebrow; $('#listDateSmall').textContent=`Journée du ${shortDate(localDate())}`;
     const contextCard=$('#morningContextCard');
     contextCard.classList.toggle('hidden',currentType!=='morning');
