@@ -227,8 +227,8 @@
     [
       ['Riz blanc (x9kg)','800 ml vinaigre x3'],['Riz noir (x4kg)','100 ml/kg'],
       ['Saumon','Inventaire · À couper · À mariner'],
-      ['Thon','À décongeler · À mariner'],
-      ['Crevettes','À décongeler · À mariner']
+      ['Crevettes','À décongeler · À mariner'],
+      ['Thon','À décongeler · À mariner']
     ].forEach(([t,n])=>add('morning','Riz et protéines',t,n));
 
     // Reprise de la fiche « FICHE PREPARATIONS ET DECONGELATIONS C3 2026 ».
@@ -320,6 +320,15 @@
             if(!morningNames.has(title.toUpperCase())) saved.tasks.push({id:uuid(),list_type:'morning',group_name:'Riz et protéines',title,note,sort_order:saved.tasks.filter(t=>t.list_type==='morning').length+i,active:true});
           });
           saved.dataVersion=4;
+        }
+        if ((saved.dataVersion || 1) < 5) {
+          const riceBlack=saved.tasks.find(t=>t.list_type==='morning'&&String(t.title||'').trim().toUpperCase()==='RIZ NOIR (X4KG)');
+          const baseOrder=riceBlack?.sort_order ?? Math.max(0,...saved.tasks.filter(t=>t.list_type==='morning').map(t=>t.sort_order||0));
+          [['Saumon',1],['Crevettes',2],['Thon',3]].forEach(([title,offset])=>{
+            const task=saved.tasks.find(t=>t.list_type==='morning'&&String(t.title||'').trim().toUpperCase()===title.toUpperCase());
+            if(task){task.group_name='Riz et protéines';task.sort_order=baseOrder+offset;task.active=true;}
+          });
+          saved.dataVersion=5;
           saveDemo(saved);
         }
         return saved;
