@@ -254,7 +254,7 @@
         {id:'demo-emp-2', full_name:'Employé 2', login:'employe2', password:'1234', role:'employee', active:true}
       ],
       manager: {login:'manager', password:'2468'},
-      dataVersion: 6,
+      dataVersion: 7,
       tasks: seedTasks(), completions:{}, dailyContext:{}, history:[]
     };
   }
@@ -343,6 +343,13 @@
             shrimpRows.forEach(t=>{if(t.id!==keep.id)t.active=false;});
           }
           saved.dataVersion=6;
+          saveDemo(saved);
+        }
+        if ((saved.dataVersion || 1) < 7) {
+          saved.tasks.forEach(t=>{
+            if(t.list_type==='morning'&&String(t.title||'').trim().toUpperCase()==='CREVETTES (1KG/M BAC)') t.active=false;
+          });
+          saved.dataVersion=7;
           saveDemo(saved);
         }
         return saved;
