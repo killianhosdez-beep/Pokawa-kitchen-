@@ -225,13 +225,11 @@
     ].forEach(t=>add('morning','Préparations complémentaires',t));
     ['ONI SALMON (2.5/1000)','ONI THON (1.5/1000)','ONI GUACA (1.5/1000)'].forEach(t=>add('morning','Oni',t));
     [
-      ['Riz blanc (x9kg)','800 ml vinaigre x3'],['Riz noir (x4kg)','100 ml/kg'],['Saumon (2.5kg/G bac)','']
+      ['Riz blanc (x9kg)','800 ml vinaigre x3'],['Riz noir (x4kg)','100 ml/kg'],
+      ['Saumon','Inventaire · À couper · À mariner'],
+      ['Thon','À décongeler · À mariner'],
+      ['Crevettes','À décongeler · À mariner']
     ].forEach(([t,n])=>add('morning','Riz et protéines',t,n));
-    [
-      ['Marinade saumon','Après la découpe du saumon'],
-      ['Marinade thon','Après décongélation'],
-      ['Marinade crevettes','Après décongélation']
-    ].forEach(([t,n])=>add('morning','Marinades',t,n));
 
     // Reprise de la fiche « FICHE PREPARATIONS ET DECONGELATIONS C3 2026 ».
     [
@@ -255,7 +253,7 @@
         {id:'demo-emp-2', full_name:'Employé 2', login:'employe2', password:'1234', role:'employee', active:true}
       ],
       manager: {login:'manager', password:'2468'},
-      dataVersion: 2,
+      dataVersion: 4,
       tasks: seedTasks(), completions:{}, dailyContext:{}, history:[]
     };
   }
@@ -306,6 +304,22 @@
             if(!existingDefrost.has(title)) saved.tasks.push({id:uuid(),list_type:'defrost',group_name:'Décongélations J+1',title,note:'',sort_order:i,active:true});
           });
           saved.dataVersion=3;
+        }
+        if ((saved.dataVersion || 1) < 4) {
+          const salmon=saved.tasks.find(t=>t.list_type==='morning'&&String(t.title||'').trim().toUpperCase()==='SAUMON (2.5KG/G BAC)');
+          if(salmon){salmon.title='Saumon';salmon.group_name='Riz et protéines';salmon.note='Inventaire · À couper · À mariner';salmon.active=true;}
+          const tuna=saved.tasks.find(t=>t.list_type==='morning'&&String(t.title||'').trim().toUpperCase()==='MARINADE THON');
+          if(tuna){tuna.title='Thon';tuna.group_name='Riz et protéines';tuna.note='À décongeler · À mariner';tuna.active=true;}
+          const shrimp=saved.tasks.find(t=>t.list_type==='morning'&&String(t.title||'').trim().toUpperCase()==='MARINADE CREVETTES');
+          if(shrimp){shrimp.title='Crevettes';shrimp.group_name='Riz et protéines';shrimp.note='À décongeler · À mariner';shrimp.active=true;}
+          saved.tasks.forEach(t=>{
+            if(t.list_type==='morning'&&['MARINADE SAUMON','MARINADE THON','MARINADE CREVETTES'].includes(String(t.title||'').trim().toUpperCase())) t.active=false;
+          });
+          const morningNames=new Set(saved.tasks.filter(t=>t.list_type==='morning').map(t=>String(t.title||'').trim().toUpperCase()));
+          [['Saumon','Inventaire · À couper · À mariner'],['Thon','À décongeler · À mariner'],['Crevettes','À décongeler · À mariner']].forEach(([title,note],i)=>{
+            if(!morningNames.has(title.toUpperCase())) saved.tasks.push({id:uuid(),list_type:'morning',group_name:'Riz et protéines',title,note,sort_order:saved.tasks.filter(t=>t.list_type==='morning').length+i,active:true});
+          });
+          saved.dataVersion=4;
           saveDemo(saved);
         }
         return saved;
@@ -385,6 +399,14 @@
     if (type==='morning') return [['inventory_value','Inventaire'],['production_value','Production matinée'],['afternoon_point_value','Point après-midi']];
     if (type==='afternoon') return [['inventory_value','Inv'],['quantity_value','Quantité à produire']];
     return [['quantity_value','Quantité'],['entry_note','Observation']];
+  }
+  function fieldsForTask(type,task) {
+    if(type==='morning'){
+      const name=String(task.title||'').trim().toLocaleLowerCase('fr-FR');
+      if(name==='saumon') return [['inventory_value','Inventaire'],['production_value','À couper'],['afternoon_point_value','À mariner']];
+      if(name==='thon'||name==='crevettes') return [['inventory_value','À décongeler'],['production_value','À mariner']];
+    }
+    return fieldsForType(type);
   }
 
   async function loginDemo(form, role) {
@@ -466,7 +488,7 @@
   }
   function renderChecklist() {
     const conf=TYPES[currentType]; $('#listTitle').textContent=conf.title;
-    $('#listDescription').textContent=currentType==='morning'?'Renseignez inventaire, production et point après-midi, puis cochez la tâche.':currentType==='afternoon'?'Renseignez l’inventaire et la quantité à produire, puis cochez la préparation.':'Renseignez la quantité ou une observation, puis cochez la décongélation.';
+    $('#listDescription').textContent=currentType==='morning'?'Renseignez les quantités à couper, décongeler et mariner selon le produit, puis cochez la tâche.':currentType==='afternoon'?'Renseignez l’inventaire et la quantité à produire, puis cochez la préparation.':'Renseignez la quantité ou une observation, puis cochez la décongélation.';
     $('#listEyebrow').textContent=conf.eyebrow; $('#listDateSmall').textContent=`Journée du ${shortDate(localDate())}`;
     const contextCard=$('#morningContextCard');
     contextCard.classList.toggle('hidden',currentType!=='morning');
@@ -492,7 +514,7 @@
         const who=c?(LIVE_CONFIGURED?profileName(c.completed_by):c.actor_name):''; const at=c?.completed_at||c?.updated_at;
         const blocked=c && user.role!=='manager' && c.completed_by!==user.id;
         const draft=taskDrafts.get(t.id)||{};
-        const fields=fieldsForType(currentType).map(([key,label])=>`<label class="task-field"><span>${escapeHtml(label)}</span><input type="text" inputmode="text" maxlength="50" data-task-field="${key}" value="${escapeHtml(draft[key] ?? record?.[key] ?? '')}" ${blocked?'disabled':''} aria-label="${escapeHtml(label)} pour ${escapeHtml(t.title)}"></label>`).join('');
+        const fields=fieldsForTask(currentType,t).map(([key,label])=>`<label class="task-field"><span>${escapeHtml(label)}</span><input type="text" inputmode="text" maxlength="50" data-task-field="${key}" value="${escapeHtml(draft[key] ?? record?.[key] ?? '')}" ${blocked?'disabled':''} aria-label="${escapeHtml(label)} pour ${escapeHtml(t.title)}"></label>`).join('');
         const productionMeta=c&&c.actual_quantity!=null?`<small>Réalisé : ${escapeHtml(c.actual_quantity)} / ${escapeHtml(c.requested_quantity||c.quantity_value||'—')}</small>${c.shortfall_reason?`<small class="shortfall-label">Motif : ${escapeHtml(c.shortfall_reason)}</small>`:''}`:'';
         return `<div class="task-row ${c?'done':''}" data-task-row="${escapeHtml(t.id)}"><button class="task-check" data-toggle-task="${escapeHtml(t.id)}" aria-label="${c?'Décocher':'Valider'} ${escapeHtml(t.title)}" ${blocked?'disabled':''}></button><div class="task-main"><span class="task-title">${escapeHtml(t.title)}</span>${t.note?`<span class="task-note">${escapeHtml(t.note)}</span>`:''}<div class="task-fields">${fields}</div></div><div class="task-meta">${c?`<b>${escapeHtml(who||'Réalisé')}</b><small>${escapeHtml(timeLabel(at))}</small>${productionMeta}`:'<small>À faire</small>'}</div></div>`;
       }).join('')}</article>`;
@@ -594,7 +616,7 @@
     try {
       const row=$('[data-task-row="'+taskId+'"]');
       const values={};
-      fieldsForType(currentType).forEach(([key])=>{values[key]=row?.querySelector('[data-task-field="'+key+'"]')?.value?.trim()||null;});
+      fieldsForTask(currentType,task).forEach(([key])=>{values[key]=row?.querySelector('[data-task-field="'+key+'"]')?.value?.trim()||null;});
       const storedProduction={
         requested_quantity:productionDetails?.requested_quantity??existingRecord?.requested_quantity??values.quantity_value??null,
         actual_quantity:checked?(productionDetails?.actual_quantity??existingRecord?.actual_quantity??null):(existingRecord?.actual_quantity??null),
