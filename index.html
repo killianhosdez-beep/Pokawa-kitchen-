@@ -225,8 +225,13 @@
     ].forEach(t=>add('morning','Préparations complémentaires',t));
     ['ONI SALMON (2.5/1000)','ONI THON (1.5/1000)','ONI GUACA (1.5/1000)'].forEach(t=>add('morning','Oni',t));
     [
-      ['Riz blanc (x9kg)','800 ml vinaigre x3'],['Riz noir (x4kg)','100 ml/kg'],['Saumon (2.5kg/G bac)',''],['Thon mariné (G bac/1kg)',''],['Crevettes (1kg/M bac)','']
+      ['Riz blanc (x9kg)','800 ml vinaigre x3'],['Riz noir (x4kg)','100 ml/kg'],['Saumon (2.5kg/G bac)','']
     ].forEach(([t,n])=>add('morning','Riz et protéines',t,n));
+    [
+      ['Marinade saumon','Après la découpe du saumon'],
+      ['Marinade thon','Après décongélation'],
+      ['Marinade crevettes','Après décongélation']
+    ].forEach(([t,n])=>add('morning','Marinades',t,n));
 
     // Reprise de la fiche « FICHE PREPARATIONS ET DECONGELATIONS C3 2026 ».
     [
@@ -235,9 +240,11 @@
       ['BUBBLE','MP · FR'],['BOUTEILLES','CITRON · THÉ'],['COULIS','FRAM · MANGUE'],['SAUCE SATAY',''],['Sauce Massaman',''],['Sauce Piquante',''],['Sauce DIEGO',''],['Sauce Teriyaki',''],
       ['CAROTTE RÔTIE',''],['Pois gourmands',''],['ALPRO',''],['Moelleux chocolat',''],['Cheesecake',''],['SKYR',''],['PUDDING',''],['MOCHIS','Mangue · Coco']
     ].forEach(([t,n])=>add('afternoon','Préparations après-midi',t,n));
-    // Les lignes DECONG / STOCK du document source sont placées dans la liste dédiée.
-    ['STICKY RICE DECONG','GYOZAS LÉGUMES','GYOZA POULET','SAUMON STOCK','THON STOCK','CREVETTE STOCK','AVOCAT STOCK','MANGUE STOCK','RIZ STOCK']
-      .forEach(t=>add('defrost','Décongélations J+1',t));
+    // Produits à décongeler pour la production du lendemain.
+    [
+      'EDAMAME','LENTILLES BELUGA','KATSU','POULET TERIYAKI',
+      'SAUCE MASSAMAN','SAUCE TERIYAKI','COULIS MANGUE','COULIS FRAMBOISE'
+    ].forEach(t=>add('defrost','Décongélations J+1',t));
     return rows;
   }
 
@@ -264,18 +271,40 @@
         saved.history ||= [];
         // Migration depuis le premier prototype. On conserve les validations et l'historique.
         if ((saved.dataVersion || 1) < 2) {
-          const defrostNames=['STICKY RICE DECONG','GYOZAS LÉGUMES','GYOZA POULET','SAUMON STOCK','THON STOCK','CREVETTE STOCK','AVOCAT STOCK','MANGUE STOCK','RIZ STOCK'];
+          const legacyDefrost=['STICKY RICE DECONG','GYOZAS LÉGUMES','GYOZA POULET','SAUMON STOCK','THON STOCK','CREVETTE STOCK','AVOCAT STOCK','MANGUE STOCK','RIZ STOCK'];
           saved.tasks.forEach(t=>{
             const legacyTitle=String(t.title||'').trim().toUpperCase();
             if (legacyTitle === 'COOKIR') t.title = 'COOKIES';
             if (legacyTitle === 'PUDDING FRAMBOISE') t.active = false;
-            if (defrostNames.includes(String(t.title||'').toUpperCase()) && t.list_type === 'afternoon') {
+            if (legacyDefrost.includes(legacyTitle) && t.list_type === 'afternoon') {
               t.list_type = 'defrost'; t.group_name = 'Décongélations J+1';
             }
           });
           const existing = new Set(saved.tasks.filter(t=>t.list_type==='defrost').map(t=>String(t.title||'').toUpperCase()));
           seedTasks().filter(t=>t.list_type==='defrost' && !existing.has(t.title.toUpperCase())).forEach(t=>saved.tasks.push(t));
           saved.dataVersion = 2;
+        }
+        if ((saved.dataVersion || 1) < 3) {
+          const removeFromDefrost=['STICKY RICE DECONG','GYOZAS LÉGUMES','GYOZA POULET','SAUMON STOCK','THON STOCK','CREVETTE STOCK','AVOCAT STOCK','MANGUE STOCK','RIZ STOCK'];
+          saved.tasks.forEach(t=>{
+            const title=String(t.title||'').trim().toUpperCase();
+            if(t.list_type==='defrost' && removeFromDefrost.includes(title)) t.active=false;
+          });
+          const existingMorning=new Set(saved.tasks.filter(t=>t.list_type==='morning').map(t=>String(t.title||'').trim().toUpperCase()));
+          const additions=[
+            ['Marinade saumon','Après la découpe du saumon'],
+            ['Marinade thon','Après décongélation'],
+            ['Marinade crevettes','Après décongélation']
+          ];
+          additions.forEach(([title,note],i)=>{
+            if(!existingMorning.has(title.toUpperCase())) saved.tasks.push({id:uuid(),list_type:'morning',group_name:'Marinades',title,note,sort_order:saved.tasks.filter(t=>t.list_type==='morning').length+i,active:true});
+          });
+          const desiredDefrost=['EDAMAME','LENTILLES BELUGA','KATSU','POULET TERIYAKI','SAUCE MASSAMAN','SAUCE TERIYAKI','COULIS MANGUE','COULIS FRAMBOISE'];
+          const existingDefrost=new Set(saved.tasks.filter(t=>t.list_type==='defrost'&&t.active!==false).map(t=>String(t.title||'').trim().toUpperCase()));
+          desiredDefrost.forEach((title,i)=>{
+            if(!existingDefrost.has(title)) saved.tasks.push({id:uuid(),list_type:'defrost',group_name:'Décongélations J+1',title,note:'',sort_order:i,active:true});
+          });
+          saved.dataVersion=3;
           saveDemo(saved);
         }
         return saved;
