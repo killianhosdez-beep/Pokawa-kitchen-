@@ -697,8 +697,8 @@ html.kitchen-route #kitchenLoginScreen{display:none!important}
     $('#welcomeName').textContent = actorName().split(' ')[0];
     $('#headerSubtitle').textContent = hasListManagement() ? ('Cagnes-sur-Mer · '+accessLevelLabel(user)) : 'Cagnes-sur-Mer · Cuisine';
     $('#kitchenWelcomeName').textContent = actorName().split(' ')[0];
-    $('.list-manager-only').forEach(el=>el.classList.toggle('hidden',!hasListManagement()));
-    $('.advanced-manager-only').forEach(el=>el.classList.toggle('hidden',!hasAdvancedManagement()));
+    $$('.list-manager-only').forEach(el=>el.classList.toggle('hidden',!hasListManagement()));
+    $$('.advanced-manager-only').forEach(el=>el.classList.toggle('hidden',!hasAdvancedManagement()));
     setSync(false);
     if(KITCHEN_MODE && user?.role==='employee'){
       document.body.classList.add('kitchen-mode-active');
