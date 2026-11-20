@@ -954,6 +954,13 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     $('#productionComment').value=record.shortfall_comment||'';
     updateProductionReasonVisibility();
     $('#productionCompletionDialog').showModal();
+    if(KITCHEN_MODE&&user?.role==='employee'){
+      $('#productionCompletionForm button[type="submit"]').textContent='Envoyer ma réalisation';
+      $('#productionActualQuantity').setAttribute('placeholder','Quantité réellement préparée');
+    }else{
+      $('#productionCompletionForm button[type="submit"]').textContent='Valider la production';
+      $('#productionActualQuantity').setAttribute('placeholder','Ex. 2 bacs');
+    }
     $('#productionActualQuantity').focus();
   }
   async function saveProductionCompletion(event) {
@@ -984,7 +991,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     if (existing && user.role!=='manager' && existing.completed_by && existing.completed_by!==user.id) {
       showToast('Seul un manager peut modifier la validation d’un collègue.');return false;
     }
-    if(checked&&currentType==='afternoon'&&!productionDetails&&!(KITCHEN_MODE&&user?.role==='employee')){openProductionDialog(task);return false;}
+    if(checked&&currentType==='afternoon'&&!productionDetails){openProductionDialog(task);return false;}
     try {
       const row=$('[data-task-row="'+taskId+'"]');
       const values={};
