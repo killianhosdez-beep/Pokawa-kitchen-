@@ -52,12 +52,120 @@
   /* Le mode aperçu reste local : autoriser les tests des checklists et des quantités. */
   .preview-mode #taskGroups .task-check,.preview-mode #taskGroups input,.preview-mode #productionCompletionForm button,.preview-mode #productionCompletionForm input{pointer-events:auto;opacity:1}
   .preview-mode #morningContextCard button,.preview-mode #morningContextCard input,.preview-mode #afternoonDlcCard button,.preview-mode #afternoonDlcCard input{pointer-events:auto;opacity:1}
+
+/* Espace tablette Cuisine : interface tactile en portrait */
+.kitchen-login-screen{min-height:100dvh;display:grid;place-items:center;padding:18px;background:radial-gradient(circle at 10% 10%,#e7f2ec,transparent 38%),var(--bg)}
+.kitchen-login-card{width:min(100%,480px);background:#fff;border:1px solid #e8eee9;border-radius:26px;padding:26px 22px;box-shadow:var(--shadow);text-align:center}
+.kitchen-login-card h1{font-size:29px;letter-spacing:-1px;margin:8px 0 4px}.kitchen-login-card h1 span{color:var(--green-2)}
+.kitchen-login-card .brand-mark{margin:0 auto 14px}
+.kitchen-login-card .muted{font-size:13px}
+.kitchen-employee-select{width:100%;margin:18px 0 16px;border:1px solid #dce5df;border-radius:14px;background:#fff;padding:15px 14px;font-size:17px;font-weight:700;color:var(--ink)}
+.kitchen-pin-label{font-size:11px;font-weight:800;color:#77857c;letter-spacing:.12em;margin:7px 0 12px}
+.kitchen-pin-dots{display:flex;justify-content:center;gap:13px;margin:0 0 17px}
+.kitchen-pin-dot{width:16px;height:16px;border:2px solid #cbd8cf;border-radius:50%;background:#fff}
+.kitchen-pin-dot.filled{background:var(--green);border-color:var(--green)}
+.kitchen-keypad{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;max-width:340px;margin:0 auto}
+.kitchen-key{min-height:58px;border:1px solid #e2eae4;background:#f8faf8;border-radius:14px;color:var(--green);font-size:22px;font-weight:800;box-shadow:0 2px 4px rgba(20,50,36,.03);touch-action:manipulation}
+.kitchen-key:active{background:#e8f2eb;transform:scale(.98)}
+.kitchen-key.utility{font-size:13px;color:#68776e}
+.kitchen-key:disabled,.kitchen-employee-select:disabled{opacity:.45;cursor:not-allowed}
+.kitchen-login-error{min-height:20px;color:var(--red);font-size:12px;font-weight:700;margin:12px 0 0}
+.kitchen-login-foot{margin:14px 0 0;font-size:10px;color:#89958e}
+.kitchen-live-notice{margin:12px 0 0;padding:12px;border-radius:12px;background:#fff7e7;border:1px solid #f1dfb5;color:#73531c;font-size:11px;line-height:1.45;text-align:left}
+.kitchen-manager-link{display:inline-block;margin-top:14px;font-size:11px;color:#65776b;text-decoration:underline}
+.kitchen-orientation-notice{display:none}
+#kitchenHomeView{display:none}
+#kitchenHomeView.active{display:block}
+.kitchen-home-heading{margin:4px 0 22px}
+.kitchen-home-heading h2{font-size:27px;letter-spacing:-1px;margin:0}
+.kitchen-home-heading p{margin:5px 0 0;color:var(--muted);font-size:12px}
+.kitchen-list-cards{display:grid;gap:13px}
+.kitchen-list-card{width:100%;display:flex;align-items:center;gap:14px;text-align:left;padding:19px 17px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 3px 12px rgba(22,49,39,.035);color:var(--ink);min-height:94px}
+.kitchen-list-card:active{transform:scale(.99);background:#f9fbf9}
+.kitchen-list-icon{width:48px;height:48px;flex-shrink:0;border-radius:15px;display:grid;place-items:center;font-size:24px}
+.kitchen-list-copy{flex:1;min-width:0}
+.kitchen-list-copy strong{display:block;font-size:16px}
+.kitchen-list-copy small{display:block;color:#819087;font-size:11px;margin-top:4px}
+.kitchen-list-count{font-size:13px;font-weight:850;color:var(--green);white-space:nowrap}
+.kitchen-home-progress{height:6px;background:#edf2ee;border-radius:20px;overflow:hidden;margin-top:10px}
+.kitchen-home-progress span{display:block;height:100%;background:#34875e;border-radius:20px}
+.kitchen-employee-note{margin-top:20px;padding:13px 14px;border-radius:14px;background:#edf5ef;color:#3a634b;font-size:11px;line-height:1.45}
+body.kitchen-mode .login-screen{display:none!important}
+body.kitchen-mode-active .app-shell{padding-bottom:16px}
+body.kitchen-mode-active .topbar{height:62px;padding:0 15px}
+body.kitchen-mode-active .topbar .brand-mark{width:34px;height:34px;border-radius:11px;font-size:19px}
+body.kitchen-mode-active .sync-pill{display:none}
+body.kitchen-mode-active .main-content{max-width:760px;padding:22px 15px 30px}
+body.kitchen-mode-active .bottom-nav{display:none}
+body.kitchen-mode-active #homeView,body.kitchen-mode-active #historyView,body.kitchen-mode-active #managerView{display:none!important}
+body.kitchen-mode-active #checklistView .page-heading h2{font-size:23px}
+body.kitchen-mode-active .task-groups{grid-template-columns:1fr;gap:13px}
+body.kitchen-mode-active .task-group{border-radius:16px}
+body.kitchen-mode-active .task-row{padding:16px 13px;gap:12px;min-height:76px}
+body.kitchen-mode-active .task-check{width:34px;height:34px;border-radius:10px;flex-shrink:0}
+body.kitchen-mode-active .task-title{font-size:15px}
+body.kitchen-mode-active .task-note{font-size:11px}
+body.kitchen-mode-active .task-field{min-width:105px;max-width:none}
+body.kitchen-mode-active .task-field input{font-size:14px;padding:9px}
+body.kitchen-mode-active .task-meta{min-width:74px}
+body.kitchen-mode-active .task-meta b{font-size:10px}
+body.kitchen-mode-active .task-meta small{font-size:10px}
+body.kitchen-mode-active .progress-card{margin-bottom:14px}
+body.kitchen-mode-active .morning-context,body.kitchen-mode-active .morning-context-card{padding:13px}
+body.kitchen-mode-active .production-modal{width:min(94vw,480px);padding:19px}
+@media (orientation:landscape) and (max-height:650px){
+  body.kitchen-mode .kitchen-orientation-notice{display:flex;position:fixed;inset:0;z-index:1000;background:#173b31;color:#fff;align-items:center;justify-content:center;text-align:center;padding:28px;font-size:19px;font-weight:800;line-height:1.5}
+  body.kitchen-mode .kitchen-login-screen{filter:blur(3px);pointer-events:none}
+  body.kitchen-mode-active #appShell{filter:blur(3px);pointer-events:none}
+}
+@media(max-width:560px){
+ .kitchen-login-card{padding:23px 16px}.kitchen-key{min-height:55px}
+ .kitchen-home-heading h2{font-size:24px}
+ .kitchen-list-card{padding:16px 13px;min-height:88px}
+}
 </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.53.0"></script>
   <script>if (!window.supabase?.createClient) { const fallback = document.createElement("script"); fallback.src = "https://unpkg.com/@supabase/supabase-js@2.53.0"; document.head.appendChild(fallback); }</script>
   <script>window.POKAWA_CONFIG = { SUPABASE_URL: "https://kweckmiczarcspuzchzo.supabase.co", SUPABASE_ANON_KEY: "sb_publishable_vimphKCu6Na6JevhQBWeo-Q_DiiYWljF" };</script>
 </head>
 <body>
+
+  <div id="kitchenLoginScreen" class="kitchen-login-screen hidden">
+    <div class="kitchen-login-card">
+      <div class="brand-mark">P</div>
+      <p class="eyebrow">ESPACE ÉQUIPE · TABLETTE CUISINE</p>
+      <h1>Pokawa <span>Kitchen</span></h1>
+      <p class="muted">Choisis ton prénom, saisis ton code personnel et commence tes préparations.</p>
+      <label class="field-label" for="kitchenEmployeeSelect">QUI ES-TU ?</label>
+      <select id="kitchenEmployeeSelect" class="kitchen-employee-select">
+        <option value="">Choisir mon prénom</option>
+      </select>
+      <div class="kitchen-pin-label">CODE PERSONNEL À 4 CHIFFRES</div>
+      <div id="kitchenPinDots" class="kitchen-pin-dots" aria-label="Code de quatre chiffres">
+        <span class="kitchen-pin-dot"></span><span class="kitchen-pin-dot"></span><span class="kitchen-pin-dot"></span><span class="kitchen-pin-dot"></span>
+      </div>
+      <div id="kitchenPinPad" class="kitchen-keypad">
+        <button class="kitchen-key" type="button" data-kitchen-pin="1">1</button>
+        <button class="kitchen-key" type="button" data-kitchen-pin="2">2</button>
+        <button class="kitchen-key" type="button" data-kitchen-pin="3">3</button>
+        <button class="kitchen-key" type="button" data-kitchen-pin="4">4</button>
+        <button class="kitchen-key" type="button" data-kitchen-pin="5">5</button>
+        <button class="kitchen-key" type="button" data-kitchen-pin="6">6</button>
+        <button class="kitchen-key" type="button" data-kitchen-pin="7">7</button>
+        <button class="kitchen-key" type="button" data-kitchen-pin="8">8</button>
+        <button class="kitchen-key" type="button" data-kitchen-pin="9">9</button>
+        <button class="kitchen-key utility" type="button" data-kitchen-pin="clear">Effacer</button>
+        <button class="kitchen-key" type="button" data-kitchen-pin="0">0</button>
+        <button class="kitchen-key utility" type="button" data-kitchen-pin="backspace" aria-label="Effacer le dernier chiffre">⌫</button>
+      </div>
+      <div id="kitchenLoginError" class="kitchen-login-error" role="alert"></div>
+      <div id="kitchenLiveNotice" class="kitchen-live-notice hidden"></div>
+      <p class="kitchen-login-foot">Chaque employé utilise son propre code. Ne le communique pas.</p>
+      <a class="kitchen-manager-link" href="./">Accès à l'espace management</a>
+    </div>
+    <div class="kitchen-orientation-notice">Tourne la tablette en position verticale pour utiliser Pokawa Kitchen.</div>
+  </div>
+
   <div id="loginScreen" class="login-screen">
     <div class="login-card">
       <div class="brand-mark">P</div>
@@ -96,6 +204,32 @@
     </header>
 
     <main class="main-content">
+      <section id="kitchenHomeView" class="view">
+        <div class="kitchen-home-heading">
+          <p class="eyebrow">ESPACE CUISINE · AUJOURD'HUI</p>
+          <h2>Bonjour <span id="kitchenWelcomeName">l'équipe</span> 👋</h2>
+          <p id="kitchenTodayDate"></p>
+        </div>
+        <div class="kitchen-list-cards">
+          <button class="kitchen-list-card" data-kitchen-list="morning">
+            <span class="kitchen-list-icon morning">☀</span>
+            <span class="kitchen-list-copy"><strong>Check du matin</strong><small>Inventaire et préparations du matin</small><span class="kitchen-home-progress"><span id="kitchenMorningBar"></span></span></span>
+            <span class="kitchen-list-count" id="kitchenMorningCount">0/0</span>
+          </button>
+          <button class="kitchen-list-card" data-kitchen-list="afternoon">
+            <span class="kitchen-list-icon afternoon">◷</span>
+            <span class="kitchen-list-copy"><strong>Préparations après-midi</strong><small>Quantités et réalisations</small><span class="kitchen-home-progress"><span id="kitchenAfternoonBar"></span></span></span>
+            <span class="kitchen-list-count" id="kitchenAfternoonCount">0/0</span>
+          </button>
+          <button class="kitchen-list-card" data-kitchen-list="defrost">
+            <span class="kitchen-list-icon defrost">❄</span>
+            <span class="kitchen-list-copy"><strong>Décongélations</strong><small>À anticiper pour J+1</small><span class="kitchen-home-progress"><span id="kitchenDefrostBar"></span></span></span>
+            <span class="kitchen-list-count" id="kitchenDefrostCount">0/0</span>
+          </button>
+        </div>
+        <div class="kitchen-employee-note">Pense à renseigner les quantités et à valider chaque préparation une fois terminée. Les responsables suivent l'avancement en direct.</div>
+      </section>
+
       <section id="homeView" class="view active">
         <div class="welcome-row"><div><p class="eyebrow" id="todayLabel">AUJOURD'HUI</p><h2>Bonjour <span id="welcomeName">l'équipe</span> 👋</h2><p class="muted">Voici le suivi de production du jour.</p></div><div class="date-chip" id="dateChip"></div></div>
         <div class="stats-grid">
@@ -146,7 +280,7 @@
         </div>
         <div id="managerStaffPanel" class="manager-panel hidden">
           <div class="manager-toolbar"><div><h3>Gestion de l'équipe</h3><p class="muted">Les profils désactivés restent dans l'historique.</p></div></div>
-          <form id="addEmployeeForm" class="staff-form"><label class="field-label" for="newEmployeeName">Nom et prénom</label><input id="newEmployeeName" name="full_name" type="text" maxlength="80" placeholder="Ex. Camille Martin" required><label class="field-label" for="newEmployeeEmail">Adresse e-mail de connexion</label><input id="newEmployeeEmail" name="email" type="email" placeholder="camille@exemple.fr" required><label class="field-label" for="newEmployeePassword">Mot de passe provisoire</label><input id="newEmployeePassword" name="password" type="password" minlength="8" placeholder="8 caractères minimum" required><button class="btn primary full" type="submit">＋ Ajouter l'employé</button></form>
+          <form id="addEmployeeForm" class="staff-form"><label class="field-label" for="newEmployeeName">Nom et prénom</label><input id="newEmployeeName" name="full_name" type="text" maxlength="80" placeholder="Ex. Camille Martin" required><label class="field-label" for="newEmployeeEmail">Adresse e-mail de connexion</label><input id="newEmployeeEmail" name="email" type="email" placeholder="camille@exemple.fr" required><label class="field-label" for="newEmployeePassword">Mot de passe provisoire du compte</label><input id="newEmployeePassword" name="password" type="password" minlength="8" placeholder="8 caractères minimum" required><label class="field-label" for="newEmployeePin">Code PIN tablette (4 chiffres)</label><input id="newEmployeePin" name="pin" type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" placeholder="Ex. 4826" autocomplete="new-password" required><small class="muted">Le code doit être personnel et différent de celui des autres employés.</small><button class="btn primary full" type="submit">＋ Ajouter l'employé</button></form>
           <div id="employeeList" class="employee-list"></div>
         </div>
         <div id="managerQrPanel" class="manager-panel hidden"><div class="qr-card"><p class="eyebrow">ACCÈS À L'APPLICATION</p><h3>QR code de connexion</h3><p class="muted">À générer une fois l'application publiée en ligne. Les employés pourront ensuite enregistrer le site sur l'écran d'accueil de leur téléphone.</p><div id="qrCodeCanvas" class="qr-placeholder">QR</div><p id="qrLinkText" class="qr-url">L'adresse de l'application apparaîtra ici après publication.</p><button id="generateQrBtn" class="btn secondary" type="button">Générer le QR code</button><button id="printQrBtn" class="btn primary" type="button">Imprimer le QR code</button></div></div>
@@ -203,9 +337,13 @@
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => [...document.querySelectorAll(selector)];
   const CONFIG = window.POKAWA_CONFIG || {};
+  const URL_PARAMS = new URLSearchParams(location.search);
+  const KITCHEN_MODE = URL_PARAMS.get('mode') === 'kitchen';
+  const FORCE_DEMO_MODE = URL_PARAMS.get('demo') === '1';
   const HAS_LIVE_CONFIG = Boolean(CONFIG.SUPABASE_URL && CONFIG.SUPABASE_ANON_KEY);
   const LIVE_CONFIGURED = Boolean(HAS_LIVE_CONFIG && window.supabase?.createClient);
-  let previewMode = localStorage.getItem('pokawa-kitchen-preview-mode') === '1';
+  let previewMode = localStorage.getItem('pokawa-kitchen-preview-mode') === '1' || FORCE_DEMO_MODE;
+  if (KITCHEN_MODE) document.body.classList.add('kitchen-mode');
   const IS_LIVE = () => LIVE_CONFIGURED && !previewMode;
   const DB = IS_LIVE() ? window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY) : null;
   const STORE_KEY = 'pokawa-kitchen-demo-v1';
@@ -257,8 +395,8 @@
   function freshDemo() {
     return {
       employees: [
-        {id:'demo-emp-1', full_name:'Employé 1', login:'employe1', password:'1234', role:'employee', active:true},
-        {id:'demo-emp-2', full_name:'Employé 2', login:'employe2', password:'1234', role:'employee', active:true}
+        {id:'demo-emp-1', full_name:'Employé 1', login:'employe1', password:'1234', pin:'1234', role:'employee', active:true},
+        {id:'demo-emp-2', full_name:'Employé 2', login:'employe2', password:'1234', pin:'5678', role:'employee', active:true}
       ],
       manager: {login:'manager', password:'2468'},
       dataVersion: 11,
@@ -411,7 +549,19 @@
         };
         ensureBubble('Bubble fraise',firstBubbleOrder);
         ensureBubble('Bubble mangue passion',firstBubbleOrder+1);
-        saved.dataVersion=11;
+        // Chaque compte employé reçoit un PIN individuel pour l'espace tablette.
+        const usedPins=new Set();
+        const defaultPins=['1234','5678','9012','3579','4680','8520','7410','9630'];
+        saved.employees.filter(e=>e.role!=='manager').forEach((employee,index)=>{
+          let pin=String(employee.pin||'');
+          if(!/^\d{4}$/.test(pin)||usedPins.has(pin)){
+            pin=defaultPins[index]||'';
+            while(!pin||usedPins.has(pin)) pin=String(Math.floor(1000+Math.random()*9000));
+            employee.pin=pin;
+          }
+          usedPins.add(pin);
+        });
+        saved.dataVersion=12;
         saveDemo(saved);
         return saved;
       }
@@ -432,6 +582,8 @@
   let currentView = 'homeView';
   let toastTimer = null;
   let pendingProductionTaskId = null;
+  let kitchenPin = '';
+  let kitchenFailedAttempts = 0;
 
   const actorName = () => user?.full_name || 'Équipe';
   const completionKey = (date, taskId) => `${date}::${taskId}`;
@@ -456,24 +608,86 @@
     $$('.view').forEach(v=>v.classList.toggle('active',v.id===viewId));
     $$('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.view===viewId || (viewId==='checklistView' && b.dataset.goList===currentType)));
     if (viewId==='homeView') renderHome();
+    if (viewId==='kitchenHomeView') renderKitchenHome();
     if (viewId==='checklistView') renderChecklist();
     if (viewId==='historyView') renderHistory();
     if (viewId==='managerView') { renderManagerTasks(); renderEmployees(); }
     window.scrollTo({top:0,behavior:'smooth'});
   }
   function showApp() {
-    $('#loginScreen').classList.add('hidden'); $('#appShell').classList.remove('hidden');
+    $('#loginScreen').classList.add('hidden'); $('#kitchenLoginScreen').classList.add('hidden'); $('#appShell').classList.remove('hidden');
     $('#welcomeName').textContent = actorName().split(' ')[0];
-    $('#headerSubtitle').textContent = user?.role==='manager' ? 'Cagnes-sur-Mer · Manager' : 'Cagnes-sur-Mer · Cuisine';
-    $$('.manager-only').forEach(el=>el.classList.toggle('hidden',user?.role!=='manager'));
+    $('#headerSubtitle').textContent = KITCHEN_MODE ? 'Cagnes-sur-Mer · Espace cuisine' : (user?.role==='manager' ? 'Cagnes-sur-Mer · Manager' : 'Cagnes-sur-Mer · Cuisine');
+    $('#kitchenWelcomeName').textContent = actorName().split(' ')[0];
+    $('.manager-only').forEach(el=>el.classList.toggle('hidden',user?.role!=='manager'));
     setSync(false);
-    switchView('homeView');
+    if(KITCHEN_MODE && user?.role==='employee'){
+      document.body.classList.add('kitchen-mode-active');
+      switchView('kitchenHomeView');
+    } else {
+      document.body.classList.remove('kitchen-mode-active');
+      switchView('homeView');
+    }
+  }
+  function showKitchenLogin() {
+    user=null; kitchenPin=''; $('#kitchenPinDots').querySelectorAll('.kitchen-pin-dot').forEach(dot=>dot.classList.remove('filled'));
+    $('#kitchenLoginError').textContent=''; $('#appShell').classList.add('hidden'); $('#loginScreen').classList.add('hidden');
+    $('#kitchenLoginScreen').classList.remove('hidden'); document.body.classList.remove('kitchen-mode-active');
+    if(realtimeChannel&&DB) DB.removeChannel(realtimeChannel);
+    realtimeChannel=null; renderKitchenEmployeeOptions();
   }
   function showLogin() {
+    if(KITCHEN_MODE){showKitchenLogin();return;}
     $('#appShell').classList.add('hidden'); $('#loginScreen').classList.remove('hidden');
     if (realtimeChannel && DB) DB.removeChannel(realtimeChannel);
     realtimeChannel = null; user = null; morningContextDraft = {}; taskDrafts.clear();
     $('#employeePassword').value=''; $('#managerPassword').value=''; setLoginError('');
+  }
+  function renderKitchenEmployeeOptions() {
+    const select=$('#kitchenEmployeeSelect');
+    const roster=IS_LIVE()?[]:(demo?.employees||[]).filter(e=>e.role==='employee'&&e.active!==false).sort((a,b)=>a.full_name.localeCompare(b.full_name,'fr'));
+    select.innerHTML='<option value="">Choisir mon prénom</option>'+roster.map(e=>'<option value="'+escapeHtml(e.id)+'">'+escapeHtml(e.full_name)+'</option>').join('');
+    const locked=IS_LIVE();
+    select.disabled=locked;
+    $('#kitchenPinPad').querySelectorAll('button').forEach(button=>button.disabled=locked);
+    const notice=$('#kitchenLiveNotice');
+    notice.classList.toggle('hidden',!locked);
+    if(locked) notice.textContent='La connexion par code PIN est en cours de préparation pour la version connectée. Elle doit être reliée à une vérification sécurisée côté serveur avant utilisation réelle. Pour tester cette interface, ouvre ?mode=kitchen&demo=1.';
+  }
+  function updateKitchenPinDots() {
+    $('#kitchenPinDots').querySelectorAll('.kitchen-pin-dot').forEach((dot,index)=>dot.classList.toggle('filled',index<kitchenPin.length));
+  }
+  function kitchenPinAction(value) {
+    if(IS_LIVE()){ $('#kitchenLoginError').textContent='La connexion PIN n’est pas encore activée sur la version connectée.';return; }
+    $('#kitchenLoginError').textContent='';
+    if(value==='clear'){kitchenPin='';updateKitchenPinDots();return;}
+    if(value==='backspace'){kitchenPin=kitchenPin.slice(0,-1);updateKitchenPinDots();return;}
+    if(!/^\d$/.test(value)||kitchenPin.length>=4)return;
+    if(!$('#kitchenEmployeeSelect').value){$('#kitchenLoginError').textContent='Sélectionne d’abord ton prénom.';return;}
+    kitchenPin+=value;updateKitchenPinDots();
+    if(kitchenPin.length===4) setTimeout(attemptKitchenLogin,120);
+  }
+  function attemptKitchenLogin() {
+    const selectedId=$('#kitchenEmployeeSelect').value;
+    const found=demo?.employees.find(e=>e.id===selectedId&&e.role==='employee'&&e.active!==false);
+    if(!found||String(found.pin||'')!==kitchenPin){
+      kitchenFailedAttempts++;
+      $('#kitchenLoginError').textContent='Code incorrect. Vérifie ton prénom et réessaie.';
+      kitchenPin='';updateKitchenPinDots();return;
+    }
+    kitchenFailedAttempts=0;
+    user={id:found.id,full_name:found.full_name,role:'employee',mode:'demo'};
+    employees=demo.employees.map(e=>({...e}));tasks=demo.tasks;completions=Object.values(demo.completions);history=demo.history;dailyContext=demo.dailyContext[localDate()]||{};
+    showApp();
+  }
+  function renderKitchenHome() {
+    $('#kitchenTodayDate').textContent=shortDate(localDate());
+    const values=[['morning','kitchenMorningCount','kitchenMorningBar'],['afternoon','kitchenAfternoonCount','kitchenAfternoonBar'],['defrost','kitchenDefrostCount','kitchenDefrostBar']];
+    values.forEach(([type,countId,barId])=>{
+      const progress=countType(type);
+      $('#'+countId).textContent=progress.done+'/'+progress.all;
+      $('#'+barId).style.width=progress.percent+'%';
+    });
   }
   function logDemo(action, listType, title, extra={}) {
     demo.history.unshift({id:uuid(), created_at:new Date().toISOString(), actor_name:actorName(), action, list_type:listType, title, ...extra});
@@ -803,7 +1017,7 @@
   function renderEmployees() {
     if(user?.role!=='manager')return;
     const list=IS_LIVE()?employees:demo.employees;
-    $('#employeeList').innerHTML=list.length?list.map(e=>`<div class="employee-item ${e.active===false?'inactive':''}"><div class="avatar">${escapeHtml((e.full_name||'?').split(/\s+/).map(p=>p[0]).join('').slice(0,2).toUpperCase())}</div><div><strong>${escapeHtml(e.full_name)} ${e.active===false?'<small>(désactivé)</small>':''}</strong><small>${escapeHtml(e.email||e.login||'Compte équipe')} · ${escapeHtml(e.role||'employee')}</small></div>${e.role==='manager'?'<span class="muted">Manager</span>':e.active===false?'<button data-reactivate-employee="'+escapeHtml(e.id)+'">Réactiver</button>':'<button class="danger" data-deactivate-employee="'+escapeHtml(e.id)+'">Désactiver</button>'}</div>`).join(''):`<div class="empty-state"><p>Aucun employé enregistré.</p></div>`;
+    $('#employeeList').innerHTML=list.length?list.map(e=>`<div class="employee-item ${e.active===false?'inactive':''}"><div class="avatar">${escapeHtml((e.full_name||'?').split(/\s+/).map(p=>p[0]).join('').slice(0,2).toUpperCase())}</div><div><strong>${escapeHtml(e.full_name)} ${e.active===false?'<small>(désactivé)</small>':''}</strong><small>${escapeHtml(e.email||e.login||'Compte équipe')} · ${escapeHtml(e.role||'employee')}${e.role==='employee'?(e.pin?' · PIN configuré':' · PIN à configurer'):''}</small></div>${e.role==='manager'?'<span class="muted">Manager</span>':e.active===false?'<button data-reactivate-employee="'+escapeHtml(e.id)+'">Réactiver</button>':'<button class="danger" data-deactivate-employee="'+escapeHtml(e.id)+'">Désactiver</button>'}</div>`).join(''):`<div class="empty-state"><p>Aucun employé enregistré.</p></div>`;
   }
 
   async function addTask(event) {
@@ -836,12 +1050,15 @@
   }
 
   async function addEmployee(event) {
-    event.preventDefault();const full_name=$('#newEmployeeName').value.trim();const email=$('#newEmployeeEmail').value.trim().toLowerCase();const password=$('#newEmployeePassword').value;
+    event.preventDefault();const full_name=$('#newEmployeeName').value.trim();const email=$('#newEmployeeEmail').value.trim().toLowerCase();const password=$('#newEmployeePassword').value;const pin=$('#newEmployeePin').value.trim();
     if(password.length<8){showToast('Le mot de passe doit contenir au moins 8 caractères.');return;}
+    if(!/^\d{4}$/.test(pin)){showToast('Le PIN doit contenir exactement 4 chiffres.');return;}
     try{
-      if(IS_LIVE()){const {data,error}=await DB.functions.invoke('admin-create-employee',{body:{full_name,email,password}});if(error)throw error;if(data?.error)throw new Error(data.error);await loadLiveData();}
-      else {if(demo.employees.some(e=>e.login.toLowerCase()===email||e.email?.toLowerCase()===email))throw new Error('Cet identifiant existe déjà.');demo.employees.push({id:uuid(),full_name,email,login:email,password,role:'employee',active:true});logDemo('Ajout d’employé','',full_name);saveDemo();employees=demo.employees;}
-      $('#addEmployeeForm').reset();renderEmployees();showToast('Employé ajouté. Communique-lui ses identifiants en privé.');
+      const staff=IS_LIVE()?employees:demo.employees;
+      if(staff.some(e=>e.role==='employee'&&String(e.pin||'')===pin))throw new Error('Ce code PIN est déjà utilisé par un autre employé.');
+      if(IS_LIVE()){const {data,error}=await DB.functions.invoke('admin-create-employee',{body:{full_name,email,password,pin}});if(error)throw error;if(data?.error)throw new Error(data.error);await loadLiveData();}
+      else {if(demo.employees.some(e=>e.login.toLowerCase()===email||e.email?.toLowerCase()===email))throw new Error('Cet identifiant existe déjà.');demo.employees.push({id:uuid(),full_name,email,login:email,password,pin,role:'employee',active:true});logDemo('Ajout d’employé','',full_name);saveDemo();employees=demo.employees;}
+      $('#addEmployeeForm').reset();renderEmployees();renderKitchenEmployeeOptions();showToast('Employé ajouté. Son PIN personnel est enregistré.');
     }catch(err){showToast(`Création impossible : ${err.message||err}`);}
   }
   async function setEmployeeActive(id,active) {
@@ -892,10 +1109,14 @@
     if(showNotice) showToast('Mode développeur · session conservée sur cet appareil');
   }
   $('#quickManagerLogin').addEventListener('click',()=>enterPreviewMode());
-  $('#logoutBtn').addEventListener('click',async()=>{if(IS_LIVE())await DB.auth.signOut();previewMode=false;localStorage.removeItem('pokawa-kitchen-preview-mode');document.body.classList.remove('preview-mode');showLogin();});
+  $('#logoutBtn').addEventListener('click',async()=>{if(KITCHEN_MODE){showKitchenLogin();return;}if(IS_LIVE())await DB.auth.signOut();previewMode=false;localStorage.removeItem('pokawa-kitchen-preview-mode');document.body.classList.remove('preview-mode');showLogin();});
+  $('#kitchenEmployeeSelect').addEventListener('change',()=>{kitchenPin='';updateKitchenPinDots();$('#kitchenLoginError').textContent='';});
+  $('#kitchenPinPad').addEventListener('click',event=>{const button=event.target.closest('[data-kitchen-pin]');if(button)kitchenPinAction(button.dataset.kitchenPin);});
+  $('#kitchenLoginScreen').addEventListener('keydown',event=>{if(event.key>='0'&&event.key<='9')kitchenPinAction(event.key);else if(event.key==='Backspace')kitchenPinAction('backspace');else if(event.key==='Escape')kitchenPinAction('clear');});
+  $('[data-kitchen-list]').forEach(button=>button.addEventListener('click',()=>{currentType=button.dataset.kitchenList;switchView('checklistView');}));
   $$('[data-view]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));
   $$('[data-go-list]').forEach(b=>b.addEventListener('click',()=>{currentType=b.dataset.goList;switchView('checklistView');}));
-  $$('[data-go-home]').forEach(b=>b.addEventListener('click',()=>switchView('homeView')));
+  $('[data-go-home]').forEach(b=>b.addEventListener('click',()=>switchView(KITCHEN_MODE?'kitchenHomeView':'homeView')));
   $('#taskGroups').addEventListener('click',e=>{const b=e.target.closest('[data-toggle-task]');if(b)toggleTask(b.dataset.toggleTask);});
   $('#productionCompletionForm').addEventListener('submit',saveProductionCompletion);
   $('#productionActualQuantity').addEventListener('input',updateProductionReasonVisibility);
@@ -917,7 +1138,12 @@
   $('#generateQrBtn').addEventListener('click',makeQr);$('#printQrBtn').addEventListener('click',()=>{makeQr();setTimeout(()=>window.print(),400);});
 
   // Initial screen / explain demo versus connected deployment.
-  if(IS_LIVE()){
+  if(KITCHEN_MODE){
+    renderKitchenEmployeeOptions();
+    $('#kitchenLoginScreen').classList.remove('hidden');
+    $('#loginScreen').classList.add('hidden');
+    if(!IS_LIVE()) showKitchenLogin();
+  } else if(IS_LIVE()){
     document.querySelector('label[for="employeeEmail"]').textContent='Adresse e-mail';
     document.querySelector('label[for="managerEmail"]').textContent='Adresse e-mail manager';
     $('#modeNotice').className='mode-notice live';$('#modeNotice').textContent='Mode connecté prêt. Les comptes employés et managers doivent être créés dans votre espace de gestion.';
