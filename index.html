@@ -652,26 +652,43 @@ html.kitchen-route #kitchenLoginScreen{display:none!important}
     const select=$('#employeeName');
     if(!select)return;
     const previous=select.value;
+    const requestedLive=IS_LIVE();
     try{
       let staff=[];
-      if(IS_LIVE()){
+      if(requestedLive){
         const {data,error}=await DB.functions.invoke('employee-pin-login',{body:{action:'list'}});
+        // Ignore an old secure-login response if the user switched to local demo meanwhile.
+        if(!IS_LIVE())return loadEmployeeLoginOptions();
         if(error)throw error;
         if(data?.error)throw new Error(data.error);
         staff=(data?.employees||[]).filter(e=>e.active!==false);
       }else{
-        staff=(demo?.employees||[]).filter(e=>e.active!==false);
+        const localDemo=demo||loadDemo();
+        demo=localDemo;
+        staff=(Array.isArray(localDemo?.employees)?localDemo.employees:[]).filter(e=>e.active!==false);
       }
       select.innerHTML='<option value="">Choisir votre nom dans la liste</option>'+staff
-        .sort((a,b)=>String(a.full_name).localeCompare(String(b.full_name),'fr'))
+        .sort((a,b)=>String(a.full_name||'').localeCompare(String(b.full_name||''),'fr'))
         .map(e=>'<option value="'+escapeHtml(e.full_name)+'">'+escapeHtml(e.full_name)+'</option>').join('');
       if(staff.some(e=>e.full_name===previous))select.value=previous;
       select.disabled=staff.length===0;
       if(!staff.length)select.innerHTML='<option value="">Aucun compte actif enregistré</option>';
     }catch(err){
-      select.innerHTML='<option value="">Liste indisponible — réessayez</option>';
-      select.disabled=true;
-      console.warn('Chargement des comptes impossible',err);
+      // In local mode, always show the locally stored roster instead of a remote error.
+      if(!IS_LIVE()){
+        const localDemo=demo||loadDemo();
+        demo=localDemo;
+        const localStaff=(Array.isArray(localDemo?.employees)?localDemo.employees:[]).filter(e=>e.active!==false);
+        select.innerHTML='<option value="">Choisir votre nom dans la liste</option>'+localStaff
+          .sort((a,b)=>String(a.full_name||'').localeCompare(String(b.full_name||''),'fr'))
+          .map(e=>'<option value="'+escapeHtml(e.full_name)+'">'+escapeHtml(e.full_name)+'</option>').join('');
+        select.disabled=localStaff.length===0;
+        if(!localStaff.length)select.innerHTML='<option value="">Aucun compte actif enregistré</option>';
+      }else{
+        select.innerHTML='<option value="">Liste indisponible — réessayez</option>';
+        select.disabled=true;
+        console.warn('Chargement des comptes impossible',err);
+      }
     }
   }
   function switchView(viewId) {
@@ -1295,6 +1312,7 @@ html.kitchen-route #kitchenLoginScreen{display:none!important}
     history=demo.history;
     dailyContext=demo.dailyContext[localDate()]||{};
     showApp();
+    loadEmployeeLoginOptions();
     if(showNotice) showToast('Mode développeur · session conservée sur cet appareil');
   }
   $('#quickManagerLogin').addEventListener('click',()=>enterPreviewMode());
