@@ -209,8 +209,10 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
         <button class="login-tab" data-login-tab="manager">Manager</button>
       </div>
       <form id="employeeLoginForm" class="login-form">
-        <label for="employeeName">Nom et prénom</label>
-        <input id="employeeName" name="employeeName" type="text" autocomplete="username" placeholder="Votre nom" required>
+        <label for="employeeName">Sélectionnez votre prénom</label>
+        <select id="employeeName" name="employeeName" autocomplete="username" required>
+          <option value="">Choisir votre nom dans la liste</option>
+        </select>
         <label for="employeePin">Code personnel à 4 chiffres</label>
         <input id="employeePin" name="employeePin" type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" autocomplete="one-time-code" placeholder="••••" required>
         <button class="btn primary full" type="submit">Accéder aux checklists</button>
@@ -629,6 +631,32 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     pill.innerHTML = online ? '<i></i> Synchronisé' : IS_LIVE() ? '<i></i> Connexion…' : '<i></i> Démo locale';
   };
 
+  async function loadEmployeeLoginOptions() {
+    const select=$('#employeeName');
+    if(!select)return;
+    const previous=select.value;
+    let staff=[];
+    try{
+      if(IS_LIVE()){
+        const {data,error}=await DB.functions.invoke('employee-pin-login',{body:{action:'list'}});
+        if(error)throw error;
+        if(data?.error)throw new Error(data.error);
+        staff=(data?.employees||[]).filter(e=>e.active!==false);
+      }else{
+        staff=(demo?.employees||[]).filter(e=>e.active!==false&&e.role==='employee');
+      }
+      select.innerHTML='<option value="">Choisir votre nom dans la liste</option>'+staff
+        .sort((a,b)=>String(a.full_name).localeCompare(String(b.full_name),'fr'))
+        .map(e=>'<option value="'+escapeHtml(e.full_name)+'">'+escapeHtml(e.full_name)+'</option>').join('');
+      if(staff.some(e=>e.full_name===previous))select.value=previous;
+      select.disabled=staff.length===0;
+      if(!staff.length)select.innerHTML='<option value="">Aucun employé enregistré</option>';
+    }catch(err){
+      select.innerHTML='<option value="">Liste indisponible — réessayez</option>';
+      select.disabled=true;
+      console.warn('Chargement des employés impossible',err);
+    }
+  }
   function switchLoginTab(tab) {
     $$('.login-tab').forEach(b=>b.classList.toggle('active',b.dataset.loginTab===tab));
     $('#employeeLoginForm').classList.toggle('hidden',tab!=='employee');
@@ -675,7 +703,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     $('#appShell').classList.add('hidden'); $('#loginScreen').classList.remove('hidden');
     if (realtimeChannel && DB) DB.removeChannel(realtimeChannel);
     realtimeChannel = null; user = null; morningContextDraft = {}; taskDrafts.clear();
-    $('#employeePin').value=''; $('#managerPassword').value=''; setLoginError('');
+    $('#employeePin').value=''; $('#managerPassword').value=''; setLoginError(''); loadEmployeeLoginOptions();
   }
   function renderKitchenEmployeeOptions() {
     const select=$('#kitchenEmployeeSelect');
@@ -1273,7 +1301,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     $('#loginScreen').classList.add('hidden');
     if(!IS_LIVE()) showKitchenLogin();
   } else if(IS_LIVE()){
-    document.querySelector('label[for="employeeName"]').textContent='Nom et prénom';
+    loadEmployeeLoginOptions();
     document.querySelector('label[for="managerEmail"]').textContent='Adresse e-mail manager';
     $('#modeNotice').className='mode-notice live';$('#modeNotice').textContent='Mode connecté prêt. Les comptes employés et managers doivent être créés dans votre espace de gestion.';
     $('#quickManagerLogin').classList.remove('hidden');
@@ -1287,7 +1315,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     $('#quickManagerLogin').classList.add('hidden');
   } else {
     $('#quickManagerLogin').classList.remove('hidden');
-    document.querySelector('label[for="employeeName"]').textContent='Nom et prénom';
+    loadEmployeeLoginOptions();
     document.querySelector('label[for="managerEmail"]').textContent='Identifiant manager';
     $('#modeNotice').className='mode-notice';$('#modeNotice').innerHTML='<strong>Mode démonstration local.</strong><br>Employé : <b>employe1</b> / <b>1234</b> · Manager : <b>manager</b> / <b>2468</b>. Les données restent sur cet appareil et ne sont pas partagées.';
     $('#employeeName').placeholder='Votre nom';$('#employeePin').placeholder='Code à 4 chiffres';$('#managerEmail').placeholder='manager';
