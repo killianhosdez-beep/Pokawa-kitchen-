@@ -1,0 +1,5 @@
+[functions.employee-pin-login]
+verify_jwt = false
+
+[functions.set-employee-pin]
+verify_jwt = true
