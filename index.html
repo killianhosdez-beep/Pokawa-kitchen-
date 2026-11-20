@@ -203,7 +203,7 @@
   const CONFIG = window.POKAWA_CONFIG || {};
   const HAS_LIVE_CONFIG = Boolean(CONFIG.SUPABASE_URL && CONFIG.SUPABASE_ANON_KEY);
   const LIVE_CONFIGURED = Boolean(HAS_LIVE_CONFIG && window.supabase?.createClient);
-  let previewMode = false;
+  let previewMode = localStorage.getItem('pokawa-kitchen-preview-mode') === '1';
   const IS_LIVE = () => LIVE_CONFIGURED && !previewMode;
   const DB = IS_LIVE() ? window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY) : null;
   const STORE_KEY = 'pokawa-kitchen-demo-v1';
@@ -416,7 +416,7 @@
     } catch (_) {}
     const initial = freshDemo(); saveDemo(initial); return initial;
   }
-  let demo = HAS_LIVE_CONFIG ? null : loadDemo();
+  let demo = (HAS_LIVE_CONFIG && !previewMode) ? null : loadDemo();
   let dailyContext = {};
   let morningContextDraft = {};
   const taskDrafts = new Map();
@@ -867,20 +867,22 @@
   $$('.login-tab').forEach(b=>b.addEventListener('click',()=>switchLoginTab(b.dataset.loginTab)));
   $('#employeeLoginForm').addEventListener('submit',async e=>{e.preventDefault();setLoginError('');try{IS_LIVE()?await loginLive(e.currentTarget):await loginDemo(e.currentTarget,'employee');}catch(err){setLoginError(err.message||'Connexion impossible.');}});
   $('#managerLoginForm').addEventListener('submit',async e=>{e.preventDefault();setLoginError('');try{IS_LIVE()?await loginLive(e.currentTarget):await loginDemo(e.currentTarget,'manager');}catch(err){setLoginError(err.message||'Connexion impossible.');}});
-  $('#quickManagerLogin').addEventListener('click',()=>{
+  function enterPreviewMode(showNotice=true) {
     previewMode=true;
+    localStorage.setItem('pokawa-kitchen-preview-mode','1');
     demo=demo||loadDemo();
     document.body.classList.add('preview-mode');
-    user={id:'demo-manager',full_name:'Manager · Aperçu',role:'manager',mode:'demo'};
+    user={id:'demo-manager',full_name:'Manager · Développeur',role:'manager',mode:'demo'};
     employees=demo.employees.map(e=>({...e}));
     tasks=demo.tasks;
     completions=Object.values(demo.completions);
     history=demo.history;
     dailyContext=demo.dailyContext[localDate()]||{};
     showApp();
-    showToast('Aperçu de démonstration · données non synchronisées');
-  });
-  $('#logoutBtn').addEventListener('click',async()=>{if(IS_LIVE())await DB.auth.signOut();previewMode=false;document.body.classList.remove('preview-mode');showLogin();});
+    if(showNotice) showToast('Mode développeur · session conservée sur cet appareil');
+  }
+  $('#quickManagerLogin').addEventListener('click',()=>enterPreviewMode());
+  $('#logoutBtn').addEventListener('click',async()=>{if(IS_LIVE())await DB.auth.signOut();previewMode=false;localStorage.removeItem('pokawa-kitchen-preview-mode');document.body.classList.remove('preview-mode');showLogin();});
   $$('[data-view]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));
   $$('[data-go-list]').forEach(b=>b.addEventListener('click',()=>{currentType=b.dataset.goList;switchView('checklistView');}));
   $$('[data-go-home]').forEach(b=>b.addEventListener('click',()=>switchView('homeView')));
@@ -912,7 +914,7 @@
     $('#quickManagerLogin').classList.remove('hidden');
     $('#quickManagerLogin').textContent='Aperçu rapide · Manager';
     DB.auth.getSession().then(async({data})=>{if(data.session){try{const {data:p}=await DB.from('profiles').select('id,full_name,role,active').eq('id',data.session.user.id).single();if(p?.active){user={...p,mode:'live'};await loadLiveData();setupRealtime();showApp();}}catch(_){}}});
-  } else if(HAS_LIVE_CONFIG){
+  } else if(HAS_LIVE_CONFIG && !previewMode){
     $('#modeNotice').className='mode-notice';
     $('#modeNotice').textContent='La configuration en ligne est renseignée, mais le module de connexion ne s’est pas chargé. Vérifiez la connexion Internet puis rechargez la page. Les données locales ne seront pas utilisées.';
     $('#employeeLoginForm button[type="submit"]').disabled=true;
@@ -925,6 +927,7 @@
     $('#modeNotice').className='mode-notice';$('#modeNotice').innerHTML='<strong>Mode démonstration local.</strong><br>Employé : <b>employe1</b> / <b>1234</b> · Manager : <b>manager</b> / <b>2468</b>. Les données restent sur cet appareil et ne sont pas partagées.';
     $('#employeeEmail').placeholder='employe1';$('#managerEmail').placeholder='manager';
   }
+  if(previewMode) enterPreviewMode(false);
   if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 })();
 
