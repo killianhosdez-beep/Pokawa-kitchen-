@@ -1138,7 +1138,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     try{
       const staff=IS_LIVE()?employees:demo.employees;
       if(staff.some(e=>e.role==='employee'&&String(e.pin||'')===pin))throw new Error('Ce code PIN est déjà utilisé par un autre employé.');
-      if(IS_LIVE()){const {data,error}=await DB.functions.invoke('admin-create-employee',{body:{full_name,email,password,pin}});if(error)throw error;if(data?.error)throw new Error(data.error);await loadLiveData();}
+      if(IS_LIVE()){const {data,error}=await DB.functions.invoke('admin-create-employee',{body:{full_name,email,password,pin}});if(error)throw error;if(data?.error)throw new Error(data.error);const {data:pinData,error:pinError}=await DB.functions.invoke('set-employee-pin',{body:{employee_email:email,pin}});if(pinError)throw pinError;if(pinData?.error)throw new Error(pinData.error);await loadLiveData();}
       else {if(demo.employees.some(e=>e.login.toLowerCase()===email||e.email?.toLowerCase()===email))throw new Error('Cet identifiant existe déjà.');demo.employees.push({id:uuid(),full_name,email,login:email,password,pin,role:'employee',active:true});logDemo('Ajout d’employé','',full_name);saveDemo();employees=demo.employees;}
       $('#addEmployeeForm').reset();renderEmployees();renderKitchenEmployeeOptions();showToast('Employé ajouté. Son PIN personnel est enregistré.');
     }catch(err){showToast(`Création impossible : ${err.message||err}`);}
