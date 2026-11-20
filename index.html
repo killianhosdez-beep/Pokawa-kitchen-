@@ -53,6 +53,8 @@
   /* Le mode aperçu reste local : autoriser les tests des checklists et des quantités. */
   .preview-mode #taskGroups .task-check,.preview-mode #taskGroups input,.preview-mode #productionCompletionForm button,.preview-mode #productionCompletionForm input{pointer-events:auto;opacity:1}
   .preview-mode #morningContextCard button,.preview-mode #morningContextCard input,.preview-mode #afternoonDlcCard button,.preview-mode #afternoonDlcCard input{pointer-events:auto;opacity:1}
+  /* En démo locale, la gestion des comptes doit rester testable. */
+  .preview-mode #addEmployeeForm input,.preview-mode #addEmployeeForm button{pointer-events:auto;opacity:1}
 
 /* Espace tablette Cuisine : interface tactile en portrait */
 .kitchen-login-screen{min-height:100dvh;display:grid;place-items:center;padding:18px;background:radial-gradient(circle at 10% 10%,#e7f2ec,transparent 38%),var(--bg)}
