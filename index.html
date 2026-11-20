@@ -1169,10 +1169,10 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
   $('#kitchenPinPad').addEventListener('click',event=>{const button=event.target.closest('[data-kitchen-pin]');if(button)kitchenPinAction(button.dataset.kitchenPin);});
   $('#kitchenLoginScreen').addEventListener('keydown',event=>{if(event.key>='0'&&event.key<='9')kitchenPinAction(event.key);else if(event.key==='Backspace')kitchenPinAction('backspace');else if(event.key==='Escape')kitchenPinAction('clear');});
   ['pointerdown','keydown','input','touchstart','scroll'].forEach(eventName=>document.addEventListener(eventName,resetKitchenIdleLock,{passive:true}));
-  $('[data-kitchen-list]').forEach(button=>button.addEventListener('click',()=>{currentType=button.dataset.kitchenList;switchView('checklistView');}));
+  $$('[data-kitchen-list]').forEach(button=>button.addEventListener('click',()=>{currentType=button.dataset.kitchenList;switchView('checklistView');}));
   $$('[data-view]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));
   $$('[data-go-list]').forEach(b=>b.addEventListener('click',()=>{currentType=b.dataset.goList;switchView('checklistView');}));
-  $('[data-go-home]').forEach(b=>b.addEventListener('click',()=>switchView(KITCHEN_MODE?'kitchenHomeView':'homeView')));
+  $$('[data-go-home]').forEach(b=>b.addEventListener('click',()=>switchView(KITCHEN_MODE?'kitchenHomeView':'homeView')));
   $('#taskGroups').addEventListener('click',e=>{const b=e.target.closest('[data-toggle-task]');if(b)toggleTask(b.dataset.toggleTask);});
   $('#productionCompletionForm').addEventListener('submit',saveProductionCompletion);
   $('#productionActualQuantity').addEventListener('input',updateProductionReasonVisibility);
