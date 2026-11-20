@@ -1298,7 +1298,14 @@ html.kitchen-route #kitchenLoginScreen{display:none!important}
     if(showNotice) showToast('Mode développeur · session conservée sur cet appareil');
   }
   $('#quickManagerLogin').addEventListener('click',()=>enterPreviewMode());
-  $('#logoutBtn').addEventListener('click',async()=>{if(IS_LIVE())await DB.auth.signOut();previewMode=false;localStorage.removeItem('pokawa-kitchen-preview-mode');document.body.classList.remove('preview-mode');showLogin();});
+  $('#logoutBtn').addEventListener('click',async()=>{
+    const keepDemo=previewMode||user?.mode==='demo';
+    if(IS_LIVE()&&!keepDemo)await DB.auth.signOut();
+    previewMode=keepDemo;
+    if(keepDemo){localStorage.setItem('pokawa-kitchen-preview-mode','1');document.body.classList.add('preview-mode');}
+    else{localStorage.removeItem('pokawa-kitchen-preview-mode');document.body.classList.remove('preview-mode');}
+    showLogin();
+  });
   $('#kitchenQuickLogin').addEventListener('click',()=>{
     if(!FORCE_DEMO_MODE||IS_LIVE())return;
     const found=(demo?.employees||[]).find(e=>e.role==='employee'&&e.active!==false);
