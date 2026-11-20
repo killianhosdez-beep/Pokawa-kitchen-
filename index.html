@@ -707,7 +707,10 @@ html.kitchen-route #kitchenLoginScreen{display:none!important}
       resetKitchenIdleLock();
     } else {
       document.body.classList.remove('kitchen-mode-active');
-      switchView('homeView');
+      // Chaque profil arrive automatiquement dans son espace :
+      // employé = suivi de production ; manager = gestion des listes ;
+      // manager avancé = gestion des listes + comptes, accès et QR.
+      switchView(hasListManagement() ? 'managerView' : 'homeView');
     }
   }
   function showKitchenLogin() { showLogin(); }
@@ -863,7 +866,7 @@ html.kitchen-route #kitchenLoginScreen{display:none!important}
       .on('postgres_changes',{event:'*',schema:'public',table:'checklist_tasks'},async()=>{await loadLiveData();refreshVisible();})
       .on('postgres_changes',{event:'*',schema:'public',table:'checklist_completions'},async()=>{await loadLiveData();refreshVisible();})
       .on('postgres_changes',{event:'*',schema:'public',table:'daily_context'},async()=>{await loadLiveData();refreshVisible();})
-      .on('postgres_changes',{event:'*',schema:'public',table:'profiles'},async()=>{await loadLiveData();const me=employees.find(e=>e.id===user?.id);if(!me?.active){await DB.auth.signOut();showLogin();setLoginError('Votre compte a été désactivé. Contactez un manager.');return;}refreshVisible();})
+      .on('postgres_changes',{event:'*',schema:'public',table:'profiles'},async()=>{await loadLiveData();const me=employees.find(e=>e.id===user?.id);if(!me?.active){await DB.auth.signOut();showLogin();setLoginError('Votre compte a été désactivé. Contactez un manager.');return;}if(me){user.role=me.role;user.access_level=me.access_level||(me.role==='manager'?'manager_advanced':'employee');showApp();}refreshVisible();})
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'audit_events'},()=>{if(currentView==='historyView')renderHistory();})
       .subscribe(status=>{ setSync(status==='SUBSCRIBED'); });
   }
