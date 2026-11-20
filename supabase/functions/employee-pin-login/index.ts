@@ -28,13 +28,21 @@ Deno.serve(async (req) => {
   const url = Deno.env.get("SUPABASE_URL")!;
   const anon = Deno.env.get("SUPABASE_ANON_KEY")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  let body: { full_name?: string; pin?: string };
+  let body: { action?: string; full_name?: string; pin?: string };
   try { body = await req.json(); } catch { return json({ error: "Requête invalide." }, 400); }
+
+  const admin = createClient(url, serviceKey);
+  if (body.action === "list") {
+    const { data: employees, error } = await admin.from("profiles")
+      .select("full_name").eq("role", "employee").eq("active", true).order("full_name");
+    if (error) return json({ error: "Impossible de charger la liste des employés." }, 500);
+    return json({ employees: (employees || []).filter(e => e.full_name).map(e => ({ full_name: e.full_name, active: true })) });
+  }
+
   const fullName = String(body.full_name || "").trim();
   const pin = String(body.pin || "");
   if (!fullName || fullName.length > 80 || !/^\d{4}$/.test(pin)) return json({ error: "Nom ou code personnel invalide." }, 400);
 
-  const admin = createClient(url, serviceKey);
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
   const ipHash = await sha256(ip + serviceKey.slice(0, 16));
   const cutoff = new Date(Date.now() - 15 * 60 * 1000).toISOString();
