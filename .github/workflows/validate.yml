@@ -34,3 +34,38 @@ jobs:
           });
           console.log(`Validated ${scripts.length} inline script(s).`);
           NODE
+
+      - name: Check login and access requirements
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const html = fs.readFileSync('index.html', 'utf8');
+          const required = [
+            ['employeeLoginForm', 'single shared login form'],
+            ['Connexion rapide · Application développement', 'developer quick-login button'],
+            ['newEmployeeRole', 'account access selector'],
+            ['manager_simple', 'simple manager role'],
+            ['manager_advanced', 'advanced manager role'],
+            ['hasListManagement', 'manager list permission'],
+            ['hasAdvancedManagement', 'advanced manager permission'],
+            ['body.kitchen-mode .login-screen{display:grid!important}', 'shared tablet login screen'],
+          ];
+          for (const [value, label] of required) {
+            if (!html.includes(value)) throw new Error(`Missing ${label}`);
+          }
+          if (html.includes('id="managerLoginForm"')) {
+            throw new Error('Obsolete separate manager login form is still present');
+          }
+          for (const file of [
+            'supabase/functions/employee-pin-login/index.ts',
+            'supabase/functions/admin-create-employee/index.ts',
+            'supabase/functions/set-employee-pin/index.ts',
+            'supabase/functions/update-account-access/index.ts',
+            'supabase/migrations/20261120_account_access_levels.sql',
+            'supabase/migrations/20261121_employee_pin_fingerprint.sql',
+          ]) {
+            if (!fs.existsSync(file)) throw new Error(`Missing backend file: ${file}`);
+          }
+          console.log('Login, roles, tablet route and backend files verified.');
+          NODE
