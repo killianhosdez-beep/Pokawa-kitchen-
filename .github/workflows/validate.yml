@@ -49,6 +49,8 @@ jobs:
             ['manager_advanced', 'advanced manager role'],
             ['hasListManagement', 'manager list permission'],
             ['hasAdvancedManagement', 'advanced manager permission'],
+            ["switchView(hasListManagement() ? 'managerView' : 'homeView')", 'automatic role-based landing screen'],
+            ['async function addEmployee(event)', 'asynchronous account creation'],
             ['body.kitchen-mode .login-screen{display:grid!important}', 'shared tablet login screen'],
           ];
           for (const [value, label] of required) {
