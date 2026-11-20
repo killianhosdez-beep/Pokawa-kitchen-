@@ -1179,7 +1179,7 @@ body.kitchen-mode-active .production-modal{width:min(94vw,480px);padding:19px}
     $('#modeNotice').className='mode-notice';$('#modeNotice').innerHTML='<strong>Mode démonstration local.</strong><br>Employé : <b>employe1</b> / <b>1234</b> · Manager : <b>manager</b> / <b>2468</b>. Les données restent sur cet appareil et ne sont pas partagées.';
     $('#employeeEmail').placeholder='employe1';$('#managerEmail').placeholder='manager';
   }
-  if(previewMode) enterPreviewMode(false);
+  if(previewMode && !KITCHEN_MODE) enterPreviewMode(false);
   if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 })();
 
