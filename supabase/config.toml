@@ -3,3 +3,6 @@ verify_jwt = false
 
 [functions.set-employee-pin]
 verify_jwt = true
+
+[functions.admin-create-employee]
+verify_jwt = true
