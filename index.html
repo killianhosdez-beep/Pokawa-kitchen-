@@ -95,6 +95,8 @@ body.kitchen-mode-active .app-shell{padding-bottom:16px}
 body.kitchen-mode-active .topbar{height:62px;padding:0 15px}
 body.kitchen-mode-active .topbar .brand-mark{width:34px;height:34px;border-radius:11px;font-size:19px}
 body.kitchen-mode-active .sync-pill{display:none}
+body.kitchen-mode-active .kitchen-logout-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;width:auto;min-width:112px;height:40px;padding:0 13px;border-radius:12px;background:#edf5ef;color:#173b31;border:1px solid #d9e7dc;font-size:13px;font-weight:800;white-space:nowrap;box-shadow:none}
+body.kitchen-mode-active .kitchen-logout-label{display:inline}
 body.kitchen-mode-active .main-content{max-width:760px;padding:22px 15px 30px}
 body.kitchen-mode-active .bottom-nav{display:none}
 body.kitchen-mode-active #homeView,body.kitchen-mode-active #historyView,body.kitchen-mode-active #managerView{display:none!important}
@@ -201,7 +203,7 @@ body.kitchen-mode-active .production-modal{width:min(94vw,480px);padding:19px}
   <div id="appShell" class="app-shell hidden">
     <header class="topbar">
       <div class="brand-inline"><div class="brand-mark small">P</div><div><strong>Pokawa Kitchen</strong><small id="headerSubtitle">Cagnes-sur-Mer · Cuisine</small></div></div>
-      <div class="top-actions"><span id="syncPill" class="sync-pill"><i></i> Local</span><button id="logoutBtn" class="icon-btn" title="Déconnexion" aria-label="Déconnexion">↪</button></div>
+      <div class="top-actions"><span id="syncPill" class="sync-pill"><i></i> Local</span><button id="logoutBtn" class="icon-btn kitchen-logout-btn" title="Déconnexion" aria-label="Déconnexion">↪ <span class="kitchen-logout-label">Déconnexion</span></button></div>
     </header>
 
     <main class="main-content">
@@ -1126,7 +1128,7 @@ body.kitchen-mode-active .production-modal{width:min(94vw,480px);padding:19px}
   $('#kitchenEmployeeSelect').addEventListener('change',()=>{kitchenPin='';updateKitchenPinDots();$('#kitchenLoginError').textContent='';});
   $('#kitchenPinPad').addEventListener('click',event=>{const button=event.target.closest('[data-kitchen-pin]');if(button)kitchenPinAction(button.dataset.kitchenPin);});
   $('#kitchenLoginScreen').addEventListener('keydown',event=>{if(event.key>='0'&&event.key<='9')kitchenPinAction(event.key);else if(event.key==='Backspace')kitchenPinAction('backspace');else if(event.key==='Escape')kitchenPinAction('clear');});
-  ['pointerdown','keydown','input','touchstart'].forEach(eventName=>document.addEventListener(eventName,resetKitchenIdleLock,{passive:true}));
+  ['pointerdown','keydown','input','touchstart','scroll'].forEach(eventName=>document.addEventListener(eventName,resetKitchenIdleLock,{passive:true}));
   $('[data-kitchen-list]').forEach(button=>button.addEventListener('click',()=>{currentType=button.dataset.kitchenList;switchView('checklistView');}));
   $$('[data-view]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));
   $$('[data-go-list]').forEach(b=>b.addEventListener('click',()=>{currentType=b.dataset.goList;switchView('checklistView');}));
