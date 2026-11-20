@@ -841,7 +841,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
   }
   function renderChecklist() {
     const conf=TYPES[currentType]; $('#listTitle').textContent=conf.title;
-    $('#managerListApproval').classList.toggle('hidden',user?.role!=='manager');
+    $('#managerListApproval').classList.toggle('hidden',user?.role!=='manager'||IS_LIVE());
     $('#listDescription').textContent=currentType==='morning'?'Renseignez les quantités à couper, décongeler et mariner selon le produit, puis cochez la tâche.':currentType==='afternoon'?'Renseignez l’inventaire et la quantité à produire, puis cochez la préparation.':'Renseignez la quantité ou une observation, puis cochez la décongélation.';
     $('#listEyebrow').textContent=conf.eyebrow; $('#listDateSmall').textContent=`Journée du ${shortDate(localDate())}`;
     const contextCard=$('#morningContextCard');
