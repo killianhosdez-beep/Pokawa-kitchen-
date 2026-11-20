@@ -160,6 +160,7 @@ body.kitchen-mode-active .production-modal{width:min(94vw,480px);padding:19px}
       </div>
       <div id="kitchenLoginError" class="kitchen-login-error" role="alert"></div>
       <div id="kitchenLiveNotice" class="kitchen-live-notice hidden"></div>
+      <div id="kitchenDemoNotice" class="kitchen-live-notice hidden"></div>
       <p class="kitchen-login-foot">Chaque employé utilise son propre code. Ne le communique pas.</p>
       <a class="kitchen-manager-link" href="./">Accès à l'espace management</a>
     </div>
@@ -656,6 +657,9 @@ body.kitchen-mode-active .production-modal{width:min(94vw,480px);padding:19px}
     const notice=$('#kitchenLiveNotice');
     notice.classList.toggle('hidden',!locked);
     if(locked) notice.textContent='La connexion par code PIN est en cours de préparation pour la version connectée. Elle doit être reliée à une vérification sécurisée côté serveur avant utilisation réelle. Pour tester cette interface, ouvre ?mode=kitchen&demo=1.';
+    const demoNotice=$('#kitchenDemoNotice');
+    demoNotice.classList.toggle('hidden',locked);
+    if(!locked) demoNotice.textContent='Mode démonstration : les comptes et les validations restent enregistrés uniquement sur cet appareil. Ils ne sont pas synchronisés avec les téléphones du management.';
   }
   function updateKitchenPinDots() {
     $('#kitchenPinDots').querySelectorAll('.kitchen-pin-dot').forEach((dot,index)=>dot.classList.toggle('filled',index<kitchenPin.length));
@@ -1093,7 +1097,7 @@ body.kitchen-mode-active .production-modal{width:min(94vw,480px);padding:19px}
     const root=$('#qrCodeCanvas');root.innerHTML='';
     if(location.protocol==='file:' || location.hostname==='localhost' || location.hostname==='127.0.0.1'){root.textContent='Publier d’abord';$('#qrLinkText').textContent='Le QR code sera généré après la publication en ligne.';showToast('Le QR code sera disponible après publication.');return;}
     if(!window.QRCode){root.textContent='QR';showToast('Le générateur QR n’est pas disponible.');return;}
-    const kitchenUrl=location.origin+location.pathname+'?mode=kitchen';
+    const kitchenUrl=location.origin+location.pathname+'?mode=kitchen'+(IS_LIVE()?'':'&demo=1');
     new QRCode(root,{text:kitchenUrl,width:180,height:180,colorDark:'#173b31',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
     $('#qrLinkText').textContent=kitchenUrl;
     showToast('QR code généré.');
