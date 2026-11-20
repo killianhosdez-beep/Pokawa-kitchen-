@@ -621,7 +621,7 @@ body.kitchen-mode-active .production-modal{width:min(94vw,480px);padding:19px}
     $('#welcomeName').textContent = actorName().split(' ')[0];
     $('#headerSubtitle').textContent = KITCHEN_MODE ? 'Cagnes-sur-Mer · Espace cuisine' : (user?.role==='manager' ? 'Cagnes-sur-Mer · Manager' : 'Cagnes-sur-Mer · Cuisine');
     $('#kitchenWelcomeName').textContent = actorName().split(' ')[0];
-    $('.manager-only').forEach(el=>el.classList.toggle('hidden',user?.role!=='manager'));
+    Array.from(document.querySelectorAll('.manager-only')).forEach(el=>el.classList.toggle('hidden',user?.role!=='manager'));
     setSync(false);
     if(KITCHEN_MODE && user?.role==='employee'){
       document.body.classList.add('kitchen-mode-active');
