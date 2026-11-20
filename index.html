@@ -312,7 +312,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
         </div>
         <div id="managerStaffPanel" class="manager-panel hidden">
           <div class="manager-toolbar"><div><h3>Gestion de l'équipe</h3><p class="muted">Les profils désactivés restent dans l'historique.</p></div></div>
-          <form id="addEmployeeForm" class="staff-form"><label class="field-label" for="newEmployeeName">Nom et prénom</label><input id="newEmployeeName" name="full_name" type="text" maxlength="80" placeholder="Ex. Camille Martin" required><label class="field-label" for="newEmployeeEmail">Adresse e-mail de connexion</label><input id="newEmployeeEmail" name="email" type="email" placeholder="camille@exemple.fr" required><label class="field-label" for="newEmployeePassword">Mot de passe provisoire du compte</label><input id="newEmployeePassword" name="password" type="password" minlength="8" placeholder="8 caractères minimum" required><label class="field-label" for="newEmployeePin">Code PIN tablette (4 chiffres)</label><input id="newEmployeePin" name="pin" type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" placeholder="Ex. 4826" autocomplete="new-password" required><small class="muted">Le code doit être personnel et différent de celui des autres employés.</small><button class="btn primary full" type="submit">＋ Ajouter l'employé</button></form>
+          <form id="addEmployeeForm" class="staff-form"><label class="field-label" for="newEmployeeName">Nom et prénom de l'employé</label><input id="newEmployeeName" name="full_name" type="text" maxlength="80" placeholder="Ex. Camille Martin" autocomplete="off" required><label class="field-label" for="newEmployeePin">Code personnel à 4 chiffres</label><input id="newEmployeePin" name="pin" type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" placeholder="Ex. 4826" autocomplete="new-password" required><small class="muted">L'employé se connectera depuis son téléphone avec son nom et ce code personnel. Aucun e-mail ni mot de passe provisoire à saisir.</small><button class="btn primary full" type="submit">＋ Ajouter l'employé</button></form>
           <div id="employeeList" class="employee-list"></div>
         </div>
         <div id="managerQrPanel" class="manager-panel hidden"><div class="qr-card"><p class="eyebrow">ACCÈS À L'APPLICATION</p><h3>QR code de connexion</h3><p class="muted">À générer une fois l'application publiée en ligne. Les employés pourront ensuite enregistrer le site sur l'écran d'accueil de leur téléphone.</p><div id="qrCodeCanvas" class="qr-placeholder">QR</div><p id="qrLinkText" class="qr-url">L'adresse de l'application apparaîtra ici après publication.</p><button id="generateQrBtn" class="btn secondary" type="button">Générer le QR code</button><button id="printQrBtn" class="btn primary" type="button">Imprimer le QR code</button></div></div>
@@ -1099,7 +1099,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
   function renderEmployees() {
     if(user?.role!=='manager')return;
     const list=IS_LIVE()?employees:demo.employees;
-    $('#employeeList').innerHTML=list.length?list.map(e=>`<div class="employee-item ${e.active===false?'inactive':''}"><div class="avatar">${escapeHtml((e.full_name||'?').split(/\s+/).map(p=>p[0]).join('').slice(0,2).toUpperCase())}</div><div><strong>${escapeHtml(e.full_name)} ${e.active===false?'<small>(désactivé)</small>':''}</strong><small>${escapeHtml(e.email||e.login||'Compte équipe')} · ${escapeHtml(e.role||'employee')}${e.role==='employee'?' · Connexion par PIN':''}</small></div>${e.role==='manager'?'<span class="muted">Manager</span>':e.active===false?'<button data-reactivate-employee="'+escapeHtml(e.id)+'">Réactiver</button>':'<button data-set-employee-pin="'+escapeHtml(e.id)+'">Définir le PIN</button><button class="danger" data-deactivate-employee="'+escapeHtml(e.id)+'">Désactiver</button>'}</div>`).join(''):`<div class="empty-state"><p>Aucun employé enregistré.</p></div>`;
+    $('#employeeList').innerHTML=list.length?list.map(e=>`<div class="employee-item ${e.active===false?'inactive':''}"><div class="avatar">${escapeHtml((e.full_name||'?').split(/\s+/).map(p=>p[0]).join('').slice(0,2).toUpperCase())}</div><div><strong>${escapeHtml(e.full_name)} ${e.active===false?'<small>(désactivé)</small>':''}</strong><small>${escapeHtml(e.role==='employee'?'Connexion par nom et PIN':(e.email||e.login||'Compte manager'))} · ${escapeHtml(e.role||'employee')}</small></div>${e.role==='manager'?'<span class="muted">Manager</span>':e.active===false?'<button data-reactivate-employee="'+escapeHtml(e.id)+'">Réactiver</button>':'<button data-set-employee-pin="'+escapeHtml(e.id)+'">Définir le PIN</button><button class="danger" data-deactivate-employee="'+escapeHtml(e.id)+'">Désactiver</button>'}</div>`).join(''):`<div class="empty-state"><p>Aucun employé enregistré.</p></div>`;
   }
 
   async function addTask(event) {
@@ -1132,15 +1132,23 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
   }
 
   async function addEmployee(event) {
-    event.preventDefault();const full_name=$('#newEmployeeName').value.trim();const email=$('#newEmployeeEmail').value.trim().toLowerCase();const password=$('#newEmployeePassword').value;const pin=$('#newEmployeePin').value.trim();
-    if(password.length<8){showToast('Le mot de passe doit contenir au moins 8 caractères.');return;}
-    if(!/^\d{4}$/.test(pin)){showToast('Le PIN doit contenir exactement 4 chiffres.');return;}
+    event.preventDefault();
+    const full_name=$('#newEmployeeName').value.trim().replace(/\s+/g,' ');
+    const pin=$('#newEmployeePin').value.trim();
+    if(!full_name){showToast('Renseigne le nom et le prénom de l’employé.');return;}
+    if(!/^\d{4}$/.test(pin)){showToast('Le code personnel doit contenir exactement 4 chiffres.');return;}
     try{
       const staff=IS_LIVE()?employees:demo.employees;
+      if(staff.some(e=>e.role==='employee'&&String(e.full_name||'').toLocaleLowerCase('fr-FR')===full_name.toLocaleLowerCase('fr-FR')))throw new Error('Un employé porte déjà ce nom.');
       if(staff.some(e=>e.role==='employee'&&String(e.pin||'')===pin))throw new Error('Ce code PIN est déjà utilisé par un autre employé.');
-      if(IS_LIVE()){const {data,error}=await DB.functions.invoke('admin-create-employee',{body:{full_name,email,password,pin}});if(error)throw error;if(data?.error)throw new Error(data.error);const {data:pinData,error:pinError}=await DB.functions.invoke('set-employee-pin',{body:{employee_email:email,pin}});if(pinError)throw pinError;if(pinData?.error)throw new Error(pinData.error);await loadLiveData();}
-      else {if(demo.employees.some(e=>e.login.toLowerCase()===email||e.email?.toLowerCase()===email))throw new Error('Cet identifiant existe déjà.');demo.employees.push({id:uuid(),full_name,email,login:email,password,pin,role:'employee',active:true});logDemo('Ajout d’employé','',full_name);saveDemo();employees=demo.employees;}
-      $('#addEmployeeForm').reset();renderEmployees();renderKitchenEmployeeOptions();showToast('Employé ajouté. Son PIN personnel est enregistré.');
+      if(IS_LIVE()){
+        const {data,error}=await DB.functions.invoke('admin-create-employee',{body:{full_name,pin}});
+        if(error)throw error;if(data?.error)throw new Error(data.error);await loadLiveData();
+      } else {
+        demo.employees.push({id:uuid(),full_name,email:'',login:full_name,password:'',pin,role:'employee',active:true});
+        logDemo('Ajout d’employé','',full_name);saveDemo();employees=demo.employees;
+      }
+      $('#addEmployeeForm').reset();renderEmployees();renderKitchenEmployeeOptions();showToast('Employé ajouté avec son code personnel.');
     }catch(err){showToast(`Création impossible : ${err.message||err}`);}
   }
   async function setEmployeePin(id) {
