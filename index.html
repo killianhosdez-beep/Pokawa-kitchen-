@@ -279,6 +279,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
       <section id="checklistView" class="view">
         <div class="page-heading"><button class="back-btn" data-go-home aria-label="Retour">‹</button><div><p class="eyebrow" id="listEyebrow">CHECKLIST DU JOUR</p><h2 id="listTitle">Check du matin</h2><p class="muted" id="listDescription">Cochez chaque tâche après réalisation.</p></div></div>
         <div class="progress-card"><div class="progress-top"><div><strong id="listProgressCount">0 sur 0</strong><small> tâches terminées</small></div><strong id="listProgressPercent">0 %</strong></div><div class="progress-track"><div id="listProgressBar" class="progress-fill"></div></div><small id="listDateSmall" class="muted"></small></div>
+        <section id="managerListApproval" class="morning-context hidden"><div class="morning-context-heading"><div><p class="eyebrow">CONTRÔLE MANAGER</p><h3 id="managerListApprovalTitle">Validation de la liste</h3><small id="managerListApprovalStatus">En attente de validation</small></div><button id="managerApproveListBtn" class="btn primary" type="button">Valider la liste</button></div></section>
         <section id="morningContextCard" class="morning-context hidden" aria-label="Informations du jour">
           <div class="morning-context-heading"><div><p class="eyebrow">EN-TÊTE DE LA FICHE</p><h3>Informations du service</h3></div><span id="morningContextDate" class="date-chip"></span></div>
           <div class="morning-context-bottom"><label class="dlc-check"><input id="morningDlcVerified" type="checkbox"><span><b>DLC vérifiés</b><small id="morningDlcMeta">À vérifier</small></span></label><button id="saveMorningContextBtn" class="btn primary" type="button">Enregistrer</button></div>
@@ -840,10 +841,12 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
   }
   function renderChecklist() {
     const conf=TYPES[currentType]; $('#listTitle').textContent=conf.title;
+    $('#managerListApproval').classList.toggle('hidden',user?.role!=='manager');
     $('#listDescription').textContent=currentType==='morning'?'Renseignez les quantités à couper, décongeler et mariner selon le produit, puis cochez la tâche.':currentType==='afternoon'?'Renseignez l’inventaire et la quantité à produire, puis cochez la préparation.':'Renseignez la quantité ou une observation, puis cochez la décongélation.';
     $('#listEyebrow').textContent=conf.eyebrow; $('#listDateSmall').textContent=`Journée du ${shortDate(localDate())}`;
     const contextCard=$('#morningContextCard');
     contextCard.classList.toggle('hidden',currentType!=='morning');
+    if(KITCHEN_MODE&&user?.role==='employee'){contextCard.classList.add('hidden');afternoonDlcCard.classList.add('hidden');}
     const afternoonDlcCard=$('#afternoonDlcCard');
     afternoonDlcCard.classList.toggle('hidden',currentType!=='afternoon');
     const ctx=dailyContext||{};
@@ -861,6 +864,15 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     }
     const all=listTasks(currentType); const done=all.filter(t=>getDone(t)); const pct=all.length?Math.round(done.length/all.length*100):0;
     $('#listProgressCount').textContent=`${done.length} sur ${all.length}`; $('#listProgressPercent').textContent=`${pct} %`; $('#listProgressBar').style.width=`${pct}%`;
+    const approvalKey=currentType+'_approved';
+    const approval=(demo?.dailyContext?.[localDate()]||{})[approvalKey];
+    const approvalStatus=$('#managerListApprovalStatus');
+    const approveButton=$('#managerApproveListBtn');
+    if(user?.role==='manager'){
+      approvalStatus.textContent=approval?('Validée par '+(approval.name||'Manager')+' · '+timeLabel(approval.at)):(done.length===all.length&&all.length?'Toutes les tâches sont terminées · Validation manager en attente':done.length+' sur '+all.length+' tâches terminées');
+      approveButton.disabled=Boolean(approval)||done.length!==all.length||!all.length;
+      approveButton.textContent=approval?'Liste validée':'Valider la liste';
+    }
     $('#emptyListMessage').classList.toggle('hidden',all.length!==0);
     const groups=new Map(); all.forEach(t=>{const g=t.group_name||'À préparer'; if(!groups.has(g))groups.set(g,[]); groups.get(g).push(t);});
     $('#taskGroups').innerHTML=[...groups.entries()].map(([group,items])=>{
@@ -870,7 +882,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
         const who=c?(IS_LIVE()?profileName(c.completed_by):c.actor_name):''; const at=c?.completed_at||c?.updated_at;
         const blocked=c && user.role!=='manager' && c.completed_by!==user.id;
         const draft=taskDrafts.get(t.id)||{};
-        const fields=fieldsForTask(currentType,t).map(([key,label])=>{const managerOnlyField=KITCHEN_MODE&&user.role==='employee'&&currentType==='afternoon'&&key==='quantity_value';return `<label class="task-field"><span>${escapeHtml(label)}</span><input type="text" inputmode="text" maxlength="50" data-task-field="${key}" value="${escapeHtml(draft[key] ?? record?.[key] ?? '')}" ${blocked||managerOnlyField?'disabled':''} aria-label="${escapeHtml(label)} pour ${escapeHtml(t.title)}"></label>`;}).join('');
+        const fields=fieldsForTask(currentType,t).map(([key,label])=>{const employeeReadOnly=KITCHEN_MODE&&user.role==='employee';return `<label class="task-field ${employeeReadOnly?'employee-readonly-field':''}"><span>${escapeHtml(label)}</span><input type="text" inputmode="text" maxlength="50" data-task-field="${key}" value="${escapeHtml(record?.[key] ?? '')}" disabled aria-label="${escapeHtml(label)} pour ${escapeHtml(t.title)}"></label>`;}).join('');
         const productionMeta=c&&c.actual_quantity!=null?`<small>Réalisé : ${escapeHtml(c.actual_quantity)} / ${escapeHtml(c.requested_quantity||c.quantity_value||'—')}</small>${c.shortfall_reason?`<small class="shortfall-label">Motif : ${escapeHtml(c.shortfall_reason)}</small>`:''}`:'';
         const inventoryNow=String(draft.inventory_value ?? record?.inventory_value ?? '').trim();
         const quantityNow=String(draft.quantity_value ?? record?.quantity_value ?? '').trim();
@@ -972,11 +984,11 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     if (existing && user.role!=='manager' && existing.completed_by && existing.completed_by!==user.id) {
       showToast('Seul un manager peut modifier la validation d’un collègue.');return false;
     }
-    if(checked&&currentType==='afternoon'&&!productionDetails){openProductionDialog(task);return false;}
+    if(checked&&currentType==='afternoon'&&!productionDetails&&!(KITCHEN_MODE&&user?.role==='employee')){openProductionDialog(task);return false;}
     try {
       const row=$('[data-task-row="'+taskId+'"]');
       const values={};
-      fieldsForTask(currentType,task).forEach(([key])=>{values[key]=row?.querySelector('[data-task-field="'+key+'"]')?.value?.trim()||null;});
+      fieldsForTask(currentType,task).forEach(([key])=>{values[key]=KITCHEN_MODE&&user?.role==='employee'?(existingRecord?.[key]??null):(row?.querySelector('[data-task-field="'+key+'"]')?.value?.trim()||null);});
       const storedProduction={
         requested_quantity:productionDetails?.requested_quantity??existingRecord?.requested_quantity??values.quantity_value??null,
         actual_quantity:checked?(productionDetails?.actual_quantity??existingRecord?.actual_quantity??null):(existingRecord?.actual_quantity??null),
@@ -1012,6 +1024,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
         const isPartial=checked&&Boolean(storedProduction.shortfall_reason);
         const description=productionDetails?'Demandé : '+storedProduction.requested_quantity+' · Réalisé : '+storedProduction.actual_quantity+(isPartial?' · Motif : '+storedProduction.shortfall_reason+(storedProduction.shortfall_comment?' — '+storedProduction.shortfall_comment:''):' · Production complète'):'';
         logDemo(checked?(isPartial?'Validation partielle':'Validation'):'Réouverture',currentType,task.title,{task_id:taskId,fields:values,...(description?{description,requested_quantity:storedProduction.requested_quantity,actual_quantity:storedProduction.actual_quantity,shortfall_reason:storedProduction.shortfall_reason,shortfall_comment:storedProduction.shortfall_comment}:{})});
+        if(demo.dailyContext[localDate()]) delete demo.dailyContext[localDate()][currentType+'_approved'];
         completions=Object.values(demo.completions); saveDemo();
       }
       taskDrafts.delete(taskId);
@@ -1182,6 +1195,15 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
   $('#productionCompletionDialog').addEventListener('close',()=>{pendingProductionTaskId=null;});
   $('#taskGroups').addEventListener('input',e=>{const input=e.target.closest('[data-task-field]');if(!input)return;const row=input.closest('[data-task-row]');if(!row)return;const draft=taskDrafts.get(row.dataset.taskRow)||{};draft[input.dataset.taskField]=input.value;taskDrafts.set(row.dataset.taskRow,draft);if(currentType==='afternoon'&&user?.role==='manager'){const warning=row.querySelector('.quantity-warning');if(warning){const inv=String(draft.inventory_value??row.querySelector('[data-task-field="inventory_value"]')?.value??'').trim();const qty=String(draft.quantity_value??row.querySelector('[data-task-field="quantity_value"]')?.value??'').trim();warning.classList.toggle('hidden',!inv||Boolean(qty));}}});
   $('#taskGroups').addEventListener('change',async e=>{const input=e.target.closest('[data-task-field="quantity_value"]');if(!input||currentType!=='afternoon'||user?.role!=='manager')return;const value=input.value.trim();if(value!=='0')return;const row=input.closest('[data-task-row]');if(!row)return;const inventory=row.querySelector('[data-task-field="inventory_value"]')?.value.trim()||'';if(!inventory){showToast('Renseigne d’abord l’inventaire avant de valider une production à zéro.');return;}const taskId=row.dataset.taskRow;if(getDone(tasks.find(t=>t.id===taskId)))return;const saved=await toggleTask(taskId,{requested_quantity:'0',actual_quantity:'0',shortfall_reason:null,shortfall_comment:null});if(saved)showToast('Aucune production nécessaire : préparation validée par le manager.');});
+  $('#managerApproveListBtn').addEventListener('click',()=>{
+    if(user?.role!=='manager')return;
+    if(IS_LIVE()){showToast('La validation finale des listes connectées nécessite encore son enregistrement sécurisé.');return;}
+    const progress=countType(currentType);
+    if(!progress.all||progress.done!==progress.all){showToast('Toutes les préparations doivent être cochées avant validation manager.');return;}
+    const day=demo.dailyContext[localDate()]||{};
+    day[currentType+'_approved']={name:actorName(),at:new Date().toISOString(),by:user.id};
+    demo.dailyContext[localDate()]=day;dailyContext=day;saveDemo();renderChecklist();showToast('Liste validée par le manager.');
+  });
   $('#saveMorningContextBtn').addEventListener('click',saveMorningContext);
   $('#saveAfternoonDlcBtn').addEventListener('click',saveAfternoonDlc);
   $('#historyType').addEventListener('change',renderHistory);$('#historyDate').addEventListener('change',renderHistory);$('#exportHistoryBtn').addEventListener('click',exportHistoryCsv);
