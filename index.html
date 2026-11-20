@@ -213,6 +213,7 @@ html.kitchen-route #kitchenLoginScreen{display:none!important}
       </form>
 
       <button id="quickManagerLogin" class="btn secondary full" type="button">Connexion rapide · Application développement</button>
+      <button id="switchLiveMode" class="btn secondary full hidden" type="button">Quitter la démo · Utiliser les données partagées</button>
       <div id="loginError" class="error-text" role="alert"></div>
       <p class="login-foot">Accès réservé à l'équipe du restaurant.</p>
     </div>
@@ -654,9 +655,6 @@ html.kitchen-route #kitchenLoginScreen{display:none!important}
     const previous=select.value;
     const requestedLive=IS_LIVE();
     try{
-      const localDemo=demo||loadDemo();
-      demo=localDemo;
-      const localStaff=(Array.isArray(localDemo?.employees)?localDemo.employees:[]).filter(e=>e.active!==false);
       let staff=[];
       if(requestedLive){
         const {data,error}=await DB.functions.invoke('employee-pin-login',{body:{action:'list'}});
@@ -664,12 +662,11 @@ html.kitchen-route #kitchenLoginScreen{display:none!important}
         if(!IS_LIVE())return loadEmployeeLoginOptions();
         if(error)throw error;
         if(data?.error)throw new Error(data.error);
-        const liveStaff=(data?.employees||[]).filter(e=>e.active!==false);
-        // Also expose locally-created demo accounts so they can be selected and tested on this device.
-        const liveNames=new Set(liveStaff.map(e=>String(e.full_name||'').toLocaleLowerCase('fr-FR')));
-        staff=[...liveStaff,...localStaff.filter(e=>!liveNames.has(String(e.full_name||'').toLocaleLowerCase('fr-FR')))];
+        staff=(data?.employees||[]).filter(e=>e.active!==false);
       }else{
-        staff=localStaff;
+        const localDemo=demo||loadDemo();
+        demo=localDemo;
+        staff=(Array.isArray(localDemo?.employees)?localDemo.employees:[]).filter(e=>e.active!==false);
       }
       select.innerHTML='<option value="">Choisir votre nom dans la liste</option>'+staff
         .sort((a,b)=>String(a.full_name||'').localeCompare(String(b.full_name||''),'fr'))
@@ -740,6 +737,7 @@ html.kitchen-route #kitchenLoginScreen{display:none!important}
     if (realtimeChannel && DB) DB.removeChannel(realtimeChannel);
     realtimeChannel = null; user = null; morningContextDraft = {}; taskDrafts.clear();
     $('#employeePin').value=''; setLoginError('');
+    $('#switchLiveMode').classList.toggle('hidden',!(previewMode&&LIVE_CONFIGURED));
     loadEmployeeLoginOptions();
     document.body.classList.remove('kitchen-mode-active');
   }
@@ -1306,14 +1304,7 @@ html.kitchen-route #kitchenLoginScreen{display:none!important}
   $('#employeeLoginForm').addEventListener('submit',async e=>{
     e.preventDefault();setLoginError('');
     try{
-      const selectedName=String(new FormData(e.currentTarget).get('employeeName')||'').trim();
-      const localAccount=(demo||loadDemo()).employees.find(person=>person.active!==false&&String(person.full_name||'').toLocaleLowerCase('fr-FR')===selectedName.toLocaleLowerCase('fr-FR'));
-      if(localAccount){
-        previewMode=true;
-        localStorage.setItem('pokawa-kitchen-preview-mode','1');
-        document.body.classList.add('preview-mode');
-        await loginDemo(e.currentTarget);
-      }else if(IS_LIVE()) await loginLive(e.currentTarget);
+      if(IS_LIVE()) await loginLive(e.currentTarget);
       else await loginDemo(e.currentTarget);
     }catch(err){setLoginError(err.message||'Connexion impossible.');}
   });
@@ -1333,6 +1324,14 @@ html.kitchen-route #kitchenLoginScreen{display:none!important}
     if(showNotice) showToast('Mode développeur · session conservée sur cet appareil');
   }
   $('#quickManagerLogin').addEventListener('click',()=>enterPreviewMode());
+  $('#switchLiveMode').addEventListener('click',()=>{
+    if(!LIVE_CONFIGURED){showToast('La connexion partagée n’est pas configurée.');return;}
+    previewMode=false;
+    localStorage.removeItem('pokawa-kitchen-preview-mode');
+    const nextUrl=new URL(location.href);
+    nextUrl.searchParams.delete('demo');
+    location.replace(nextUrl.toString());
+  });
   $('#logoutBtn').addEventListener('click',async()=>{
     const keepDemo=previewMode||user?.mode==='demo';
     if(IS_LIVE()&&!keepDemo)await DB.auth.signOut();
