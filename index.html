@@ -126,7 +126,29 @@ body.kitchen-mode-active .production-modal{width:min(94vw,480px);padding:19px}
  .kitchen-home-heading h2{font-size:24px}
  .kitchen-list-card{padding:16px 13px;min-height:88px}
 }
+html.kitchen-route #loginScreen{display:none!important}
+html.kitchen-route #kitchenLoginScreen{display:grid!important}
+html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!important}
+.kitchen-start-error{margin:12px 0;padding:12px;border-radius:12px;background:#fff0ef;color:#8b2721;font-size:12px;line-height:1.45;text-align:left}
 </style>
+  <script>
+    (function(){
+      try {
+        if(new URLSearchParams(location.search).get('mode')==='kitchen') {
+          document.documentElement.classList.add('kitchen-route');
+          const report=function(message){
+            const show=function(){
+              const node=document.getElementById('kitchenStartError');
+              if(node){node.textContent='Le démarrage de la tablette a rencontré une erreur : '+message;node.classList.remove('hidden');}
+            };
+            if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',show,{once:true});else show();
+          };
+          window.addEventListener('error',function(event){report(event.message||'Erreur JavaScript');});
+          window.addEventListener('unhandledrejection',function(event){report(event.reason?.message||String(event.reason||'Erreur de chargement'));});
+        }
+      } catch(_){}
+    })();
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.53.0"></script>
   <script>if (!window.supabase?.createClient) { const fallback = document.createElement("script"); fallback.src = "https://unpkg.com/@supabase/supabase-js@2.53.0"; document.head.appendChild(fallback); }</script>
   <script>window.POKAWA_CONFIG = { SUPABASE_URL: "https://kweckmiczarcspuzchzo.supabase.co", SUPABASE_ANON_KEY: "sb_publishable_vimphKCu6Na6JevhQBWeo-Q_DiiYWljF" };</script>
@@ -139,6 +161,7 @@ body.kitchen-mode-active .production-modal{width:min(94vw,480px);padding:19px}
       <p class="eyebrow">ESPACE ÉQUIPE · TABLETTE CUISINE</p>
       <h1>Pokawa <span>Kitchen</span></h1>
       <p class="muted">Choisis ton prénom, saisis ton code personnel et commence tes préparations.</p>
+      <div id="kitchenStartError" class="kitchen-start-error hidden" role="alert"></div>
       <label class="field-label" for="kitchenEmployeeSelect">QUI ES-TU ?</label>
       <select id="kitchenEmployeeSelect" class="kitchen-employee-select">
         <option value="">Choisir mon prénom</option>
