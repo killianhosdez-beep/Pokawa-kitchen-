@@ -1099,7 +1099,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
   function renderEmployees() {
     if(user?.role!=='manager')return;
     const list=IS_LIVE()?employees:demo.employees;
-    $('#employeeList').innerHTML=list.length?list.map(e=>`<div class="employee-item ${e.active===false?'inactive':''}"><div class="avatar">${escapeHtml((e.full_name||'?').split(/\s+/).map(p=>p[0]).join('').slice(0,2).toUpperCase())}</div><div><strong>${escapeHtml(e.full_name)} ${e.active===false?'<small>(désactivé)</small>':''}</strong><small>${escapeHtml(e.email||e.login||'Compte équipe')} · ${escapeHtml(e.role||'employee')}${e.role==='employee'?(e.pin?' · PIN configuré':' · PIN à configurer'):''}</small></div>${e.role==='manager'?'<span class="muted">Manager</span>':e.active===false?'<button data-reactivate-employee="'+escapeHtml(e.id)+'">Réactiver</button>':'<button class="danger" data-deactivate-employee="'+escapeHtml(e.id)+'">Désactiver</button>'}</div>`).join(''):`<div class="empty-state"><p>Aucun employé enregistré.</p></div>`;
+    $('#employeeList').innerHTML=list.length?list.map(e=>`<div class="employee-item ${e.active===false?'inactive':''}"><div class="avatar">${escapeHtml((e.full_name||'?').split(/\s+/).map(p=>p[0]).join('').slice(0,2).toUpperCase())}</div><div><strong>${escapeHtml(e.full_name)} ${e.active===false?'<small>(désactivé)</small>':''}</strong><small>${escapeHtml(e.email||e.login||'Compte équipe')} · ${escapeHtml(e.role||'employee')}${e.role==='employee'?' · Connexion par PIN':''}</small></div>${e.role==='manager'?'<span class="muted">Manager</span>':e.active===false?'<button data-reactivate-employee="'+escapeHtml(e.id)+'">Réactiver</button>':'<button data-set-employee-pin="'+escapeHtml(e.id)+'">Définir le PIN</button><button class="danger" data-deactivate-employee="'+escapeHtml(e.id)+'">Désactiver</button>'}</div>`).join(''):`<div class="empty-state"><p>Aucun employé enregistré.</p></div>`;
   }
 
   async function addTask(event) {
@@ -1142,6 +1142,23 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
       else {if(demo.employees.some(e=>e.login.toLowerCase()===email||e.email?.toLowerCase()===email))throw new Error('Cet identifiant existe déjà.');demo.employees.push({id:uuid(),full_name,email,login:email,password,pin,role:'employee',active:true});logDemo('Ajout d’employé','',full_name);saveDemo();employees=demo.employees;}
       $('#addEmployeeForm').reset();renderEmployees();renderKitchenEmployeeOptions();showToast('Employé ajouté. Son PIN personnel est enregistré.');
     }catch(err){showToast(`Création impossible : ${err.message||err}`);}
+  }
+  async function setEmployeePin(id) {
+    const staff=IS_LIVE()?employees:demo.employees;
+    const employee=staff.find(e=>e.id===id&&e.role==='employee');
+    if(!employee)return;
+    const pin=window.prompt(`Nouveau code personnel à 4 chiffres pour ${employee.full_name} :`)||'';
+    if(!/^\d{4}$/.test(pin)){if(pin)showToast('Le code doit contenir exactement 4 chiffres.');return;}
+    try{
+      if(IS_LIVE()){
+        const {data,error}=await DB.functions.invoke('set-employee-pin',{body:{employee_email:employee.email,pin}});
+        if(error)throw error;if(data?.error)throw new Error(data.error);
+      }else{
+        if(demo.employees.some(e=>e.id!==id&&e.role==='employee'&&String(e.pin||'')===pin))throw new Error('Ce code PIN est déjà utilisé.');
+        employee.pin=pin;saveDemo();employees=demo.employees;
+      }
+      renderEmployees();showToast('Code personnel enregistré.');
+    }catch(err){showToast(`Modification du PIN impossible : ${err.message||err}`);}
   }
   async function setEmployeeActive(id,active) {
     try{
@@ -1237,7 +1254,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
   $('#addTaskForm').addEventListener('submit',addTask);$('#editTaskForm').addEventListener('submit',saveEditTask);
   $('#managerTaskList').addEventListener('click',e=>{const edit=e.target.closest('[data-edit-task]');const deactivate=e.target.closest('[data-deactivate-task]');const activate=e.target.closest('[data-reactivate-task]');if(edit)openEditTask(edit.dataset.editTask);if(deactivate)setTaskActive(deactivate.dataset.deactivateTask,false);if(activate)setTaskActive(activate.dataset.reactivateTask,true);});
   $('#addEmployeeForm').addEventListener('submit',addEmployee);
-  $('#employeeList').addEventListener('click',e=>{const de=e.target.closest('[data-deactivate-employee]');const ac=e.target.closest('[data-reactivate-employee]');if(de)setEmployeeActive(de.dataset.deactivateEmployee,false);if(ac)setEmployeeActive(ac.dataset.reactivateEmployee,true);});
+  $('#employeeList').addEventListener('click',e=>{const de=e.target.closest('[data-deactivate-employee]');const ac=e.target.closest('[data-reactivate-employee]');const pin=e.target.closest('[data-set-employee-pin]');if(de)setEmployeeActive(de.dataset.deactivateEmployee,false);if(ac)setEmployeeActive(ac.dataset.reactivateEmployee,true);if(pin)setEmployeePin(pin.dataset.setEmployeePin);});
   $$('.manager-tab').forEach(b=>b.addEventListener('click',()=>managerTab(b.dataset.managerTab)));
   $('#generateQrBtn').addEventListener('click',makeQr);$('#printQrBtn').addEventListener('click',()=>{makeQr();setTimeout(()=>window.print(),400);});
 
