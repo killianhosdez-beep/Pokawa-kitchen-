@@ -908,6 +908,8 @@
     document.querySelector('label[for="employeeEmail"]').textContent='Adresse e-mail';
     document.querySelector('label[for="managerEmail"]').textContent='Adresse e-mail manager';
     $('#modeNotice').className='mode-notice live';$('#modeNotice').textContent='Mode connecté prêt. Les comptes employés et managers doivent être créés dans votre espace de gestion.';
+    $('#quickManagerLogin').classList.remove('hidden');
+    $('#quickManagerLogin').textContent='Aperçu rapide · Manager';
     DB.auth.getSession().then(async({data})=>{if(data.session){try{const {data:p}=await DB.from('profiles').select('id,full_name,role,active').eq('id',data.session.user.id).single();if(p?.active){user={...p,mode:'live'};await loadLiveData();setupRealtime();showApp();}}catch(_){}}});
   } else if(HAS_LIVE_CONFIG){
     $('#modeNotice').className='mode-notice';
