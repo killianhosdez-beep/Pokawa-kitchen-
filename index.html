@@ -203,7 +203,7 @@
   const HAS_LIVE_CONFIG = Boolean(CONFIG.SUPABASE_URL && CONFIG.SUPABASE_ANON_KEY);
   const LIVE_CONFIGURED = Boolean(HAS_LIVE_CONFIG && window.supabase?.createClient);
   let previewMode = false;
-  const IS_LIVE = () => IS_LIVE() && !previewMode;
+  const IS_LIVE = () => LIVE_CONFIGURED && !previewMode;
   const DB = IS_LIVE() ? window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY) : null;
   const STORE_KEY = 'pokawa-kitchen-demo-v1';
   const TYPES = {
