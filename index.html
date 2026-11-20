@@ -1093,8 +1093,9 @@ body.kitchen-mode-active .production-modal{width:min(94vw,480px);padding:19px}
     const root=$('#qrCodeCanvas');root.innerHTML='';
     if(location.protocol==='file:' || location.hostname==='localhost' || location.hostname==='127.0.0.1'){root.textContent='Publier d’abord';$('#qrLinkText').textContent='Le QR code sera généré après la publication en ligne.';showToast('Le QR code sera disponible après publication.');return;}
     if(!window.QRCode){root.textContent='QR';showToast('Le générateur QR n’est pas disponible.');return;}
-    new QRCode(root,{text:location.href.split('#')[0],width:180,height:180,colorDark:'#173b31',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
-    $('#qrLinkText').textContent=location.href.split('#')[0];
+    const kitchenUrl=location.origin+location.pathname+'?mode=kitchen';
+    new QRCode(root,{text:kitchenUrl,width:180,height:180,colorDark:'#173b31',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
+    $('#qrLinkText').textContent=kitchenUrl;
     showToast('QR code généré.');
   }
 
