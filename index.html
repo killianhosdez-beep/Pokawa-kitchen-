@@ -1148,7 +1148,9 @@ html.kitchen-route #kitchenLoginScreen{display:none!important}
     }).join(''):'<div class="empty-state"><p>Aucun compte enregistré.</p></div>';
   }
   async function addTask(event) {
-    event.preventDefault(); const title=$('#newTaskName').value.trim(); const group=$('#newTaskGroup').value.trim(); if(!title)return;
+    event.preventDefault();
+    if(!hasListManagement()){showToast('Accès réservé aux managers.');return;}
+    const title=$('#newTaskName').value.trim(); const group=$('#newTaskGroup').value.trim(); if(!title)return;
     try {
       if(IS_LIVE()){const {error}=await DB.from('checklist_tasks').insert({list_type:$('#managerListSelect').value,title,group_name:group||null,note:null,sort_order:listTasks($('#managerListSelect').value,true).length,active:true,created_by:user.id});if(error)throw error;await loadLiveData();}
       else {demo.tasks.push({id:uuid(),list_type:$('#managerListSelect').value,title,group_name:group||'À préparer',note:'',sort_order:demo.tasks.length,active:true});logDemo('Ajout de préparation',$('#managerListSelect').value,title);tasks=demo.tasks;saveDemo();}
@@ -1160,7 +1162,9 @@ html.kitchen-route #kitchenLoginScreen{display:none!important}
     $('#editTaskId').value=t.id;$('#editTaskTitle').value=t.title;$('#editTaskGroup').value=t.group_name||'';$('#editTaskNote').value=t.note||'';$('#editTaskDialog').showModal();
   }
   async function saveEditTask(event) {
-    event.preventDefault(); const id=$('#editTaskId').value; const title=$('#editTaskTitle').value.trim(); const group=$('#editTaskGroup').value.trim(); const note=$('#editTaskNote').value.trim();
+    event.preventDefault();
+    if(!hasListManagement()){showToast('Accès réservé aux managers.');return;}
+    const id=$('#editTaskId').value; const title=$('#editTaskTitle').value.trim(); const group=$('#editTaskGroup').value.trim(); const note=$('#editTaskNote').value.trim();
     try{
       if(IS_LIVE()){const {error}=await DB.from('checklist_tasks').update({title,group_name:group||null,note:note||null,updated_by:user.id}).eq('id',id);if(error)throw error;await loadLiveData();}
       else {const t=demo.tasks.find(x=>x.id===id);if(t){t.title=title;t.group_name=group||'À préparer';t.note=note;logDemo('Modification de préparation',t.list_type,title,{description:'Intitulé ou indication modifié'});saveDemo();tasks=demo.tasks;}}
@@ -1168,6 +1172,7 @@ html.kitchen-route #kitchenLoginScreen{display:none!important}
     }catch(err){showToast(`Modification impossible : ${err.message||err}`);}
   }
   async function setTaskActive(id,active) {
+    if(!hasListManagement())return;
     const t=tasks.find(x=>x.id===id);if(!t)return;
     try{
       if(IS_LIVE()){const {error}=await DB.from('checklist_tasks').update({active,updated_by:user.id}).eq('id',id);if(error)throw error;await loadLiveData();}
