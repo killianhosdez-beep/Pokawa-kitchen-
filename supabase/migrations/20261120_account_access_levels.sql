@@ -27,12 +27,3 @@ begin
       check (access_level in ('employee', 'manager_simple', 'manager_advanced'));
   end if;
 end $$;
-
--- Empreinte HMAC-like (hash + secret serveur) pour empêcher la réutilisation
--- du même PIN par plusieurs comptes sans stocker le PIN en clair.
-alter table public.employee_pin_credentials
-  add column if not exists pin_fingerprint text;
-
-create unique index if not exists employee_pin_credentials_fingerprint_uidx
-  on public.employee_pin_credentials (pin_fingerprint)
-  where pin_fingerprint is not null;
