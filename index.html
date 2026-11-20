@@ -113,7 +113,7 @@ body.kitchen-mode-active .task-meta small{font-size:10px}
 body.kitchen-mode-active .progress-card{margin-bottom:14px}
 body.kitchen-mode-active .morning-context,body.kitchen-mode-active .morning-context-card{padding:13px}
 body.kitchen-mode-active .production-modal{width:min(94vw,480px);padding:19px}
-@media (orientation:landscape) and (max-height:650px){
+@media (orientation:landscape){
   body.kitchen-mode .kitchen-orientation-notice{display:flex;position:fixed;inset:0;z-index:1000;background:#173b31;color:#fff;align-items:center;justify-content:center;text-align:center;padding:28px;font-size:19px;font-weight:800;line-height:1.5}
   body.kitchen-mode .kitchen-login-screen{filter:blur(3px);pointer-events:none}
   body.kitchen-mode-active #appShell{filter:blur(3px);pointer-events:none}
@@ -584,6 +584,7 @@ body.kitchen-mode-active .production-modal{width:min(94vw,480px);padding:19px}
   let pendingProductionTaskId = null;
   let kitchenPin = '';
   let kitchenFailedAttempts = 0;
+  let kitchenIdleTimer = null;
 
   const actorName = () => user?.full_name || 'Équipe';
   const completionKey = (date, taskId) => `${date}::${taskId}`;
@@ -624,12 +625,14 @@ body.kitchen-mode-active .production-modal{width:min(94vw,480px);padding:19px}
     if(KITCHEN_MODE && user?.role==='employee'){
       document.body.classList.add('kitchen-mode-active');
       switchView('kitchenHomeView');
+      resetKitchenIdleLock();
     } else {
       document.body.classList.remove('kitchen-mode-active');
       switchView('homeView');
     }
   }
   function showKitchenLogin() {
+    clearTimeout(kitchenIdleTimer); kitchenIdleTimer=null;
     user=null; kitchenPin=''; $('#kitchenPinDots').querySelectorAll('.kitchen-pin-dot').forEach(dot=>dot.classList.remove('filled'));
     $('#kitchenLoginError').textContent=''; $('#appShell').classList.add('hidden'); $('#loginScreen').classList.add('hidden');
     $('#kitchenLoginScreen').classList.remove('hidden'); document.body.classList.remove('kitchen-mode-active');
@@ -688,6 +691,11 @@ body.kitchen-mode-active .production-modal{width:min(94vw,480px);padding:19px}
       $('#'+countId).textContent=progress.done+'/'+progress.all;
       $('#'+barId).style.width=progress.percent+'%';
     });
+  }
+  function resetKitchenIdleLock() {
+    if(!KITCHEN_MODE||user?.role!=='employee')return;
+    clearTimeout(kitchenIdleTimer);
+    kitchenIdleTimer=setTimeout(()=>showKitchenLogin(),5*60*1000);
   }
   function logDemo(action, listType, title, extra={}) {
     demo.history.unshift({id:uuid(), created_at:new Date().toISOString(), actor_name:actorName(), action, list_type:listType, title, ...extra});
@@ -1113,6 +1121,7 @@ body.kitchen-mode-active .production-modal{width:min(94vw,480px);padding:19px}
   $('#kitchenEmployeeSelect').addEventListener('change',()=>{kitchenPin='';updateKitchenPinDots();$('#kitchenLoginError').textContent='';});
   $('#kitchenPinPad').addEventListener('click',event=>{const button=event.target.closest('[data-kitchen-pin]');if(button)kitchenPinAction(button.dataset.kitchenPin);});
   $('#kitchenLoginScreen').addEventListener('keydown',event=>{if(event.key>='0'&&event.key<='9')kitchenPinAction(event.key);else if(event.key==='Backspace')kitchenPinAction('backspace');else if(event.key==='Escape')kitchenPinAction('clear');});
+  ['pointerdown','keydown','input','touchstart'].forEach(eventName=>document.addEventListener(eventName,resetKitchenIdleLock,{passive:true}));
   $('[data-kitchen-list]').forEach(button=>button.addEventListener('click',()=>{currentType=button.dataset.kitchenList;switchView('checklistView');}));
   $$('[data-view]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));
   $$('[data-go-list]').forEach(b=>b.addEventListener('click',()=>{currentType=b.dataset.goList;switchView('checklistView');}));
