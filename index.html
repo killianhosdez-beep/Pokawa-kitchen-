@@ -37,7 +37,8 @@
 .production-modal .production-field>span{font-size:12px;font-weight:750;color:#526159}
 .production-modal input,.production-modal select,.production-modal textarea{width:100%;border:1px solid #dce5df;border-radius:10px;padding:11px 12px;background:#fff;color:var(--ink);font:inherit}
 .production-modal textarea{min-height:76px;resize:vertical}
-.production-modal .production-help{font-size:10px;color:#7d8982;margin:0;line-height:1.45}
+.production-modal .production-field-label{display:block;font-size:13px;font-weight:800;margin:8px 0}.production-reason-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.reason-chip{border:1px solid #dce5df;border-radius:11px;background:#f8faf8;padding:11px 9px;color:#294438;font-size:12px;font-weight:700;text-align:left}.reason-chip.selected{background:#e4f1e8;border-color:#287d5a;color:#174b35;box-shadow:inset 0 0 0 1px #287d5a}
+.production-help{font-size:10px;color:#7d8982;margin:0;line-height:1.45}
 .incomplete-panel{border:1px solid #f0dfbb;background:#fffaf0;border-radius:15px;padding:14px 15px;margin-bottom:17px}
 .incomplete-panel h3{font-size:14px;margin:0;color:#75551e}
 .incomplete-panel>p{font-size:11px;color:#8b713e;margin:4px 0 10px}
@@ -335,20 +336,19 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
       <div class="production-summary"><small>Quantité à produire</small><strong id="productionRequestedQuantity">—</strong></div>
       <label class="production-field" for="productionActualQuantity"><span>Quantité réellement produite</span><input id="productionActualQuantity" type="text" maxlength="50" placeholder="Ex. 2 bacs" required></label>
       <p class="production-help">Indique la quantité obtenue, avec la même unité que la quantité demandée.</p>
+      <input id="productionReason" type="hidden">
       <div id="productionReasonBlock" class="hidden">
-        <label class="production-field" for="productionReason"><span>Pourquoi la quantité est-elle incomplète ?</span>
-          <select id="productionReason">
-            <option value="">Choisir un motif</option>
-            <option value="Rupture de stock">Rupture de stock</option>
-            <option value="Manque de matière première">Manque de matière première</option>
-            <option value="Manque de temps">Manque de temps</option>
-            <option value="Problème matériel">Problème matériel</option>
-            <option value="Produit non conforme">Produit non conforme</option>
-            <option value="Erreur d’inventaire">Erreur d’inventaire</option>
-            <option value="Autre">Autre</option>
-          </select>
-        </label>
-        <p class="production-help">Un motif est obligatoire lorsqu’il manque une partie de la quantité demandée.</p>
+        <span class="production-field-label">Il manque une partie de la quantité. Pourquoi ?</span>
+        <div id="productionReasonOptions" class="production-reason-options">
+          <button type="button" class="reason-chip" data-reason="Rupture de stock">Rupture de stock</button>
+          <button type="button" class="reason-chip" data-reason="Manque de matière première">Manque de matière première</button>
+          <button type="button" class="reason-chip" data-reason="Manque de temps">Manque de temps</button>
+          <button type="button" class="reason-chip" data-reason="Problème matériel">Problème matériel</button>
+          <button type="button" class="reason-chip" data-reason="Produit non conforme">Produit non conforme</button>
+          <button type="button" class="reason-chip" data-reason="Erreur d’inventaire">Erreur d’inventaire</button>
+          <button type="button" class="reason-chip" data-reason="Autre">Autre</button>
+        </div>
+        <p class="production-help">Choisis un motif pour pouvoir envoyer ta préparation.</p>
       </div>
       <div id="productionCommentBlock" class="hidden">
         <label class="production-field" for="productionComment"><span>Précision</span><textarea id="productionComment" maxlength="300" placeholder="Explique brièvement la situation…"></textarea></label>
@@ -934,8 +934,9 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     const actual=$('#productionActualQuantity').value.trim();
     const partial=Boolean(actual)&&productionIsPartial(requested,actual);
     $('#productionReasonBlock').classList.toggle('hidden',!partial);
-    $('#productionReason').required=partial;
+    $('#productionReasonBlock').classList.toggle('hidden',!partial);
     const other=partial&&$('#productionReason').value==='Autre';
+    $('.reason-chip').forEach(button=>button.classList.toggle('selected',button.dataset.reason===$('#productionReason').value));
     $('#productionCommentBlock').classList.toggle('hidden',!other);
     $('#productionComment').required=Boolean(other);
     if(!partial){$('#productionReason').value='';$('#productionComment').value='';}
@@ -1196,7 +1197,11 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
   $('#taskGroups').addEventListener('click',e=>{const b=e.target.closest('[data-toggle-task]');if(b)toggleTask(b.dataset.toggleTask);});
   $('#productionCompletionForm').addEventListener('submit',saveProductionCompletion);
   $('#productionActualQuantity').addEventListener('input',updateProductionReasonVisibility);
-  $('#productionReason').addEventListener('change',updateProductionReasonVisibility);
+  $('#productionReasonOptions').addEventListener('click',event=>{
+    const button=event.target.closest('[data-reason]');if(!button)return;
+    $('#productionReason').value=button.dataset.reason;
+    updateProductionReasonVisibility();
+  });
   $('#closeProductionDialog').addEventListener('click',()=>$('#productionCompletionDialog').close());
   $('#cancelProductionDialog').addEventListener('click',()=>$('#productionCompletionDialog').close());
   $('#productionCompletionDialog').addEventListener('close',()=>{pendingProductionTaskId=null;});
