@@ -204,27 +204,18 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
       <h1>Pokawa <span>Kitchen</span></h1>
       <p class="muted intro">Les checklists du restaurant, accessibles depuis votre téléphone ou la tablette.</p>
       <div id="modeNotice" class="mode-notice"></div>
-      <div class="login-tabs">
-        <button class="login-tab active" data-login-tab="employee">Employé</button>
-        <button class="login-tab" data-login-tab="manager">Manager</button>
-      </div>
+      
       <form id="employeeLoginForm" class="login-form">
-        <label for="employeeName">Sélectionnez votre prénom</label>
+        <label for="employeeName">Sélectionnez votre nom</label>
         <select id="employeeName" name="employeeName" autocomplete="username" required>
           <option value="">Choisir votre nom dans la liste</option>
         </select>
         <label for="employeePin">Code personnel à 4 chiffres</label>
         <input id="employeePin" name="employeePin" type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" autocomplete="one-time-code" placeholder="••••" required>
-        <button class="btn primary full" type="submit">Accéder aux checklists</button>
+        <button class="btn primary full" type="submit">Se connecter</button>
       </form>
-      <form id="managerLoginForm" class="login-form hidden">
-        <label for="managerEmail">Adresse e-mail manager ou identifiant (démo)</label>
-        <input id="managerEmail" name="managerEmail" type="text" autocomplete="username" placeholder="manager@exemple.fr" required>
-        <label for="managerPassword">Code / mot de passe manager</label>
-        <input id="managerPassword" name="managerPassword" type="password" autocomplete="current-password" placeholder="Votre code confidentiel" required>
-        <button class="btn primary full" type="submit">Ouvrir l'espace manager</button>
-      </form>
-      <button id="quickManagerLogin" class="btn secondary full" type="button">Connexion rapide · Manager</button>
+
+      <button id="quickManagerLogin" class="btn secondary full" type="button">Connexion rapide · Application développement</button>
       <div id="loginError" class="error-text" role="alert"></div>
       <p class="login-foot">Accès réservé à l'équipe du restaurant.</p>
     </div>
@@ -296,14 +287,14 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
       </section>
 
       <section id="historyView" class="view">
-        <div class="page-heading"><div><p class="eyebrow">TRAÇABILITÉ</p><h2>Historique</h2><p class="muted">Les validations et les modifications des listes.</p></div><button id="exportHistoryBtn" class="btn secondary manager-only hidden" type="button">↓ Exporter CSV</button></div>
+        <div class="page-heading"><div><p class="eyebrow">TRAÇABILITÉ</p><h2>Historique</h2><p class="muted">Les validations et les modifications des listes.</p></div><button id="exportHistoryBtn" class="btn secondary advanced-manager-only hidden" type="button">↓ Exporter CSV</button></div>
         <div class="history-filter"><label for="historyType">Liste</label><select id="historyType"><option value="all">Toutes les listes</option><option value="morning">Check du matin</option><option value="afternoon">Préparations après-midi</option><option value="defrost">Décongélations</option></select><label for="historyDate">Date</label><input id="historyDate" type="date"></div>
         <div id="historyItems" class="history-items"></div>
       </section>
 
       <section id="managerView" class="view">
         <div class="page-heading"><div><p class="eyebrow">ADMINISTRATION</p><h2>Espace manager</h2><p class="muted">Gérez les listes et les accès de l'équipe.</p></div><span class="manager-shield">◆</span></div>
-        <div class="manager-tabs"><button class="manager-tab active" data-manager-tab="tasks">Préparations</button><button class="manager-tab" data-manager-tab="staff">Employés</button><button class="manager-tab" data-manager-tab="qr">QR code</button></div>
+        <div class="manager-tabs"><button class="manager-tab active" data-manager-tab="tasks">Préparations</button><button class="manager-tab advanced-manager-only hidden" data-manager-tab="staff">Comptes et accès</button><button class="manager-tab advanced-manager-only hidden" data-manager-tab="qr">QR code</button></div>
         <div id="managerTasksPanel" class="manager-panel">
           <section id="incompleteProductionPanel" class="incomplete-panel hidden"><h3>Productions incomplètes aujourd’hui</h3><p>Les quantités manquantes et leurs motifs déclarés.</p><div id="incompleteProductionList" class="incomplete-list"></div></section>
           <div class="manager-toolbar"><div><h3>Gestion des listes</h3><p class="muted">Ajouter, modifier ou désactiver des tâches.</p></div></div>
@@ -312,12 +303,25 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
           <form id="addTaskForm" class="add-task-form"><input id="newTaskName" type="text" placeholder="Nom de la préparation" maxlength="90" required><input id="newTaskGroup" type="text" placeholder="Rubrique (facultatif)" maxlength="50"><button class="btn primary" type="submit">＋ Ajouter</button></form>
           <div id="managerTaskList" class="manager-task-list"></div>
         </div>
-        <div id="managerStaffPanel" class="manager-panel hidden">
+        <div id="managerStaffPanel" class="manager-panel advanced-manager-only hidden">
           <div class="manager-toolbar"><div><h3>Gestion de l'équipe</h3><p class="muted">Les profils désactivés restent dans l'historique.</p></div></div>
-          <form id="addEmployeeForm" class="staff-form"><label class="field-label" for="newEmployeeName">Nom et prénom de l'employé</label><input id="newEmployeeName" name="full_name" type="text" maxlength="80" placeholder="Ex. Camille Martin" autocomplete="off" required><label class="field-label" for="newEmployeePin">Code personnel à 4 chiffres</label><input id="newEmployeePin" name="pin" type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" placeholder="Ex. 4826" autocomplete="new-password" required><small class="muted">L'employé se connectera depuis son téléphone avec son nom et ce code personnel. Aucun e-mail ni mot de passe provisoire à saisir.</small><button class="btn primary full" type="submit">＋ Ajouter l'employé</button></form>
+          <form id="addEmployeeForm" class="staff-form">
+            <label class="field-label" for="newEmployeeName">Nom et prénom</label>
+            <input id="newEmployeeName" name="full_name" type="text" maxlength="80" placeholder="Ex. Camille Martin" autocomplete="off" required>
+            <label class="field-label" for="newEmployeeRole">Niveau d'accès</label>
+            <select id="newEmployeeRole" name="access_level" class="select-large" required>
+              <option value="employee">Employé</option>
+              <option value="manager_simple">Manager simple</option>
+              <option value="manager_advanced">Manager avancé</option>
+            </select>
+            <label class="field-label" for="newEmployeePin">Code PIN personnel à 4 chiffres</label>
+            <input id="newEmployeePin" name="pin" type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" placeholder="Ex. 4826" autocomplete="new-password" required>
+            <small class="muted">La personne se connectera depuis n'importe quel téléphone ou tablette avec son nom et ce code.</small>
+            <button class="btn primary full" type="submit">＋ Ajouter le compte</button>
+          </form>
           <div id="employeeList" class="employee-list"></div>
         </div>
-        <div id="managerQrPanel" class="manager-panel hidden"><div class="qr-card"><p class="eyebrow">ACCÈS À L'APPLICATION</p><h3>QR code de connexion</h3><p class="muted">À générer une fois l'application publiée en ligne. Les employés pourront ensuite enregistrer le site sur l'écran d'accueil de leur téléphone.</p><div id="qrCodeCanvas" class="qr-placeholder">QR</div><p id="qrLinkText" class="qr-url">L'adresse de l'application apparaîtra ici après publication.</p><button id="generateQrBtn" class="btn secondary" type="button">Générer le QR code</button><button id="printQrBtn" class="btn primary" type="button">Imprimer le QR code</button></div></div>
+        <div id="managerQrPanel" class="manager-panel advanced-manager-only hidden"><div class="qr-card"><p class="eyebrow">ACCÈS À L'APPLICATION</p><h3>QR code de connexion</h3><p class="muted">À générer une fois l'application publiée en ligne. Les employés pourront ensuite enregistrer le site sur l'écran d'accueil de leur téléphone.</p><div id="qrCodeCanvas" class="qr-placeholder">QR</div><p id="qrLinkText" class="qr-url">L'adresse de l'application apparaîtra ici après publication.</p><button id="generateQrBtn" class="btn secondary" type="button">Générer le QR code</button><button id="printQrBtn" class="btn primary" type="button">Imprimer le QR code</button></div></div>
       </section>
     </main>
 
@@ -327,7 +331,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
       <button class="nav-item" data-go-list="afternoon"><span>◷</span><small>Après-midi</small></button>
       <button class="nav-item" data-go-list="defrost"><span>❄</span><small>Décong.</small></button>
       <button class="nav-item" data-view="historyView"><span>↺</span><small>Historique</small></button>
-      <button class="nav-item manager-only hidden" data-view="managerView"><span>⚙</span><small>Manager</small></button>
+      <button class="nav-item list-manager-only hidden" data-view="managerView"><span>⚙</span><small>Manager</small></button>
     </nav>
   </div>
   <div id="toast" class="toast" role="status"></div>
@@ -429,7 +433,8 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     return {
       employees: [
         {id:'demo-emp-1', full_name:'Employé 1', login:'employe1', password:'1234', pin:'1234', role:'employee', active:true},
-        {id:'demo-emp-2', full_name:'Employé 2', login:'employe2', password:'1234', pin:'5678', role:'employee', active:true}
+        {id:'demo-emp-2', full_name:'Employé 2', login:'employe2', password:'1234', pin:'5678', role:'employee', access_level:'employee', active:true},
+        {id:'demo-manager-1', full_name:'Manager développement', login:'manager', password:'2468', pin:'2468', role:'manager', access_level:'manager_advanced', active:true}
       ],
       manager: {login:'manager', password:'2468'},
       dataVersion: 11,
@@ -594,7 +599,14 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
           }
           usedPins.add(pin);
         });
-        saved.dataVersion=12;
+        saved.employees.forEach(e=>{
+          if(e.role==='manager'&&!e.access_level)e.access_level='manager_advanced';
+          if(e.role==='employee'&&!e.access_level)e.access_level='employee';
+        });
+        if(!saved.employees.some(e=>e.role==='manager')){
+          saved.employees.push({id:'demo-manager-1',full_name:'Manager développement',login:'manager',password:'2468',pin:'2468',role:'manager',access_level:'manager_advanced',active:true});
+        }
+        saved.dataVersion=13;
         saveDemo(saved);
         return saved;
       }
@@ -620,6 +632,14 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
   let kitchenIdleTimer = null;
 
   const actorName = () => user?.full_name || 'Équipe';
+  const hasListManagement = (person=user) => person?.role === 'manager';
+  const hasAdvancedManagement = (person=user) => hasListManagement(person) &&
+    (person.access_level === 'manager_advanced' || !person.access_level);
+  const accessLevelLabel = (person) => {
+    if(person?.access_level==='manager_advanced') return 'Manager avancé';
+    if(person?.access_level==='manager_simple') return 'Manager simple';
+    return person?.role==='manager' ? 'Manager avancé' : 'Employé';
+  };
   const completionKey = (date, taskId) => `${date}::${taskId}`;
   const showToast = (message) => {
     const el = $('#toast'); el.textContent = message; el.classList.add('show');
@@ -635,33 +655,27 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     const select=$('#employeeName');
     if(!select)return;
     const previous=select.value;
-    let staff=[];
     try{
+      let staff=[];
       if(IS_LIVE()){
         const {data,error}=await DB.functions.invoke('employee-pin-login',{body:{action:'list'}});
         if(error)throw error;
         if(data?.error)throw new Error(data.error);
         staff=(data?.employees||[]).filter(e=>e.active!==false);
       }else{
-        staff=(demo?.employees||[]).filter(e=>e.active!==false&&e.role==='employee');
+        staff=(demo?.employees||[]).filter(e=>e.active!==false);
       }
       select.innerHTML='<option value="">Choisir votre nom dans la liste</option>'+staff
         .sort((a,b)=>String(a.full_name).localeCompare(String(b.full_name),'fr'))
         .map(e=>'<option value="'+escapeHtml(e.full_name)+'">'+escapeHtml(e.full_name)+'</option>').join('');
       if(staff.some(e=>e.full_name===previous))select.value=previous;
       select.disabled=staff.length===0;
-      if(!staff.length)select.innerHTML='<option value="">Aucun employé enregistré</option>';
+      if(!staff.length)select.innerHTML='<option value="">Aucun compte actif enregistré</option>';
     }catch(err){
       select.innerHTML='<option value="">Liste indisponible — réessayez</option>';
       select.disabled=true;
-      console.warn('Chargement des employés impossible',err);
+      console.warn('Chargement des comptes impossible',err);
     }
-  }
-  function switchLoginTab(tab) {
-    $$('.login-tab').forEach(b=>b.classList.toggle('active',b.dataset.loginTab===tab));
-    $('#employeeLoginForm').classList.toggle('hidden',tab!=='employee');
-    $('#managerLoginForm').classList.toggle('hidden',tab!=='manager');
-    setLoginError('');
   }
   function switchView(viewId) {
     currentView = viewId;
@@ -671,15 +685,21 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     if (viewId==='kitchenHomeView') renderKitchenHome();
     if (viewId==='checklistView') renderChecklist();
     if (viewId==='historyView') renderHistory();
-    if (viewId==='managerView') { renderManagerTasks(); renderEmployees(); }
+    if(viewId==='managerView'){
+      if(!hasListManagement()){showToast('Accès réservé aux managers.');switchView('homeView');return;}
+      renderManagerTasks();
+      if(hasAdvancedManagement())renderEmployees();
+      managerTab('tasks');
+    }
     window.scrollTo({top:0,behavior:'smooth'});
   }
   function showApp() {
     $('#loginScreen').classList.add('hidden'); $('#kitchenLoginScreen').classList.add('hidden'); $('#appShell').classList.remove('hidden');
     $('#welcomeName').textContent = actorName().split(' ')[0];
-    $('#headerSubtitle').textContent = KITCHEN_MODE ? 'Cagnes-sur-Mer · Espace cuisine' : (user?.role==='manager' ? 'Cagnes-sur-Mer · Manager' : 'Cagnes-sur-Mer · Cuisine');
+    $('#headerSubtitle').textContent = hasListManagement() ? ('Cagnes-sur-Mer · '+accessLevelLabel(user)) : 'Cagnes-sur-Mer · Cuisine';
     $('#kitchenWelcomeName').textContent = actorName().split(' ')[0];
-    Array.from(document.querySelectorAll('.manager-only')).forEach(el=>el.classList.toggle('hidden',user?.role!=='manager'));
+    $('.list-manager-only').forEach(el=>el.classList.toggle('hidden',!hasListManagement()));
+    $('.advanced-manager-only').forEach(el=>el.classList.toggle('hidden',!hasAdvancedManagement()));
     setSync(false);
     if(KITCHEN_MODE && user?.role==='employee'){
       document.body.classList.add('kitchen-mode-active');
@@ -690,20 +710,17 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
       switchView('homeView');
     }
   }
-  function showKitchenLogin() {
-    clearTimeout(kitchenIdleTimer); kitchenIdleTimer=null;
-    user=null; kitchenPin=''; $('#kitchenPinDots').querySelectorAll('.kitchen-pin-dot').forEach(dot=>dot.classList.remove('filled'));
-    $('#kitchenLoginError').textContent=''; $('#appShell').classList.add('hidden'); $('#loginScreen').classList.add('hidden');
-    $('#kitchenLoginScreen').classList.remove('hidden'); document.body.classList.remove('kitchen-mode-active');
-    if(realtimeChannel&&DB) DB.removeChannel(realtimeChannel);
-    realtimeChannel=null; renderKitchenEmployeeOptions();
-  }
+  function showKitchenLogin() { showLogin(); }
   function showLogin() {
-    if(KITCHEN_MODE){showKitchenLogin();return;}
-    $('#appShell').classList.add('hidden'); $('#loginScreen').classList.remove('hidden');
+    clearTimeout(kitchenIdleTimer); kitchenIdleTimer=null;
+    $('#appShell').classList.add('hidden');
+    $('#kitchenLoginScreen').classList.add('hidden');
+    $('#loginScreen').classList.remove('hidden');
     if (realtimeChannel && DB) DB.removeChannel(realtimeChannel);
     realtimeChannel = null; user = null; morningContextDraft = {}; taskDrafts.clear();
-    $('#employeePin').value=''; $('#managerPassword').value=''; setLoginError(''); loadEmployeeLoginOptions();
+    $('#employeePin').value=''; setLoginError('');
+    loadEmployeeLoginOptions();
+    document.body.classList.remove('kitchen-mode-active');
   }
   function renderKitchenEmployeeOptions() {
     const select=$('#kitchenEmployeeSelect');
@@ -790,46 +807,39 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     return fieldsForType(type);
   }
 
-  async function loginDemo(form, role) {
-    const data = new FormData(form); const login=(data.get(role==='manager'?'managerEmail':'employeeName')||'').toString().trim().toLowerCase();
-    const pass=(data.get(role==='manager'?'managerPassword':'employeePin')||'').toString();
-    if (role==='manager') {
-      if (login===demo.manager.login && pass===demo.manager.password) user={id:'demo-manager',full_name:'Manager',role:'manager',mode:'demo'};
-      else throw new Error('Identifiant ou code manager incorrect. Démo : manager / 2468.');
-    } else {
-      const found=demo.employees.find(e=>e.active && e.role==='employee' && e.full_name.toLowerCase()===login);
-      if (!found || String(found.pin||'')!==pass) throw new Error('Nom ou code personnel incorrect.');
-      user={id:found.id,full_name:found.full_name,role:'employee',mode:'demo'};
-    }
-    employees=demo.employees.map(e=>({...e})); tasks=demo.tasks; completions=Object.values(demo.completions); history=demo.history; dailyContext=demo.dailyContext[localDate()]||{};
+  async function loginDemo(form) {
+    const data=new FormData(form);
+    const fullName=String(data.get('employeeName')||'').trim();
+    const pin=String(data.get('employeePin')||'');
+    if(!fullName)throw new Error('Sélectionne ton nom dans la liste.');
+    if(!/^\d{4}$/.test(pin))throw new Error('Le code personnel doit contenir 4 chiffres.');
+    const found=demo.employees.find(e=>e.active!==false&&String(e.full_name||'').toLocaleLowerCase('fr-FR')===fullName.toLocaleLowerCase('fr-FR'));
+    if(!found||String(found.pin||'')!==pin)throw new Error('Nom ou code personnel incorrect.');
+    user={id:found.id,full_name:found.full_name,role:found.role==='manager'?'manager':'employee',
+      access_level:found.access_level||(found.role==='manager'?'manager_advanced':'employee'),mode:'demo'};
+    employees=demo.employees.map(e=>({...e}));tasks=demo.tasks;completions=Object.values(demo.completions);
+    history=demo.history;dailyContext=demo.dailyContext[localDate()]||{};
     showApp();
   }
 
   async function loginLive(form) {
-    const data = new FormData(form);
-    if(form.id==='employeeLoginForm'){
-      const full_name=(data.get('employeeName')||'').toString().trim();
-      const pin=(data.get('employeePin')||'').toString();
-      if(!/^\d{4}$/.test(pin)) throw new Error('Le code personnel doit contenir 4 chiffres.');
-      const {data:loginData,error}=await DB.functions.invoke('employee-pin-login',{body:{full_name,pin}});
-      if(error) throw error;
-      if(loginData?.error) throw new Error(loginData.error);
-      const {data:authData,error:authError}=await DB.auth.verifyOtp({token_hash:loginData.token_hash,type:'magiclink'});
-      if(authError) throw authError;
-      const {data:profile,error:profileError}=await DB.from('profiles').select('id,full_name,role,active').eq('id',authData.user.id).single();
-      if(profileError||!profile||!profile.active||profile.role!=='employee'){await DB.auth.signOut();throw new Error('Compte employé inactif. Contacte un manager.');}
-      user={id:profile.id,full_name:profile.full_name,role:profile.role,mode:'live'};
-    } else {
-      const email=(data.get('managerEmail')||'').toString().trim();
-      const password=(data.get('managerPassword')||'').toString();
-      const {data:authData,error}=await DB.auth.signInWithPassword({email,password});
-      if(error) throw error;
-      const {data:profile,error:profileError}=await DB.from('profiles').select('id,full_name,role,active').eq('id',authData.user.id).single();
-      if(profileError||!profile||!profile.active){await DB.auth.signOut();throw new Error('Compte non activé. Contacte un manager.');}
-      if(profile.role!=='manager'){await DB.auth.signOut();throw new Error('Ce compte ne possède pas les droits manager.');}
-      user={id:profile.id,full_name:profile.full_name,role:profile.role,mode:'live'};
-    }
-    await loadLiveData(); setupRealtime(); showApp();
+    const data=new FormData(form);
+    const full_name=String(data.get('employeeName')||'').trim();
+    const pin=String(data.get('employeePin')||'');
+    if(!full_name)throw new Error('Sélectionne ton nom dans la liste.');
+    if(!/^\d{4}$/.test(pin))throw new Error('Le code personnel doit contenir 4 chiffres.');
+    const {data:loginData,error}=await DB.functions.invoke('employee-pin-login',{body:{full_name,pin}});
+    if(error)throw error;
+    if(loginData?.error)throw new Error(loginData.error);
+    if(!loginData?.token_hash)throw new Error('Réponse de connexion invalide. Réessaie.');
+    const {data:authData,error:authError}=await DB.auth.verifyOtp({token_hash:loginData.token_hash,type:'magiclink'});
+    if(authError)throw authError;
+    const {data:profile,error:profileError}=await DB.from('profiles')
+      .select('id,full_name,role,access_level,active').eq('id',authData.user.id).single();
+    if(profileError||!profile||!profile.active){await DB.auth.signOut();throw new Error('Compte désactivé. Contacte un manager avancé.');}
+    user={id:profile.id,full_name:profile.full_name,role:profile.role,
+      access_level:profile.access_level||(profile.role==='manager'?'manager_advanced':'employee'),mode:'live'};
+    await loadLiveData();setupRealtime();showApp();
   }
 
   async function loadLiveData() {
@@ -837,7 +847,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     const [taskRes,completionRes,employeeRes,contextRes]=await Promise.all([
       DB.from('checklist_tasks').select('*').order('list_type').order('sort_order'),
       DB.from('checklist_completions').select('*').eq('work_date',date),
-      DB.from('profiles').select('id,full_name,email,role,active,created_at').order('full_name'),
+      DB.from('profiles').select('id,full_name,email,role,access_level,active,created_at').order('full_name'),
       DB.from('daily_context').select('*').eq('work_date',date).maybeSingle()
     ]);
     if (taskRes.error) throw taskRes.error;
@@ -883,7 +893,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
   }
   function renderChecklist() {
     const conf=TYPES[currentType]; $('#listTitle').textContent=conf.title;
-    $('#managerListApproval').classList.toggle('hidden',user?.role!=='manager'||IS_LIVE());
+    $('#managerListApproval').classList.toggle('hidden',!hasListManagement()||IS_LIVE());
     $('#listDescription').textContent=currentType==='morning'?'Renseignez les quantités à couper, décongeler et mariner selon le produit, puis cochez la tâche.':currentType==='afternoon'?'Renseignez l’inventaire et la quantité à produire, puis cochez la préparation.':'Renseignez la quantité ou une observation, puis cochez la décongélation.';
     $('#listEyebrow').textContent=conf.eyebrow; $('#listDateSmall').textContent=`Journée du ${shortDate(localDate())}`;
     const contextCard=$('#morningContextCard');
@@ -910,7 +920,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     const approval=(demo?.dailyContext?.[localDate()]||{})[approvalKey];
     const approvalStatus=$('#managerListApprovalStatus');
     const approveButton=$('#managerApproveListBtn');
-    if(user?.role==='manager'){
+    if(hasListManagement()){
       approvalStatus.textContent=approval?('Validée par '+(approval.name||'Manager')+' · '+timeLabel(approval.at)):(done.length===all.length&&all.length?'Toutes les tâches sont terminées · Validation manager en attente':done.length+' sur '+all.length+' tâches terminées');
       approveButton.disabled=Boolean(approval)||done.length!==all.length||!all.length;
       approveButton.textContent=approval?'Liste validée':'Valider la liste';
@@ -922,14 +932,14 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
       return `<article class="task-group"><div class="group-heading"><h3>${escapeHtml(group)}</h3><span>${groupDone}/${items.length}</span></div>${items.map(t=>{
         const record=currentCompletion(t.id); const c=record?.completed?record:null;
         const who=c?(IS_LIVE()?profileName(c.completed_by):c.actor_name):''; const at=c?.completed_at||c?.updated_at;
-        const blocked=c && user.role!=='manager' && c.completed_by!==user.id;
+        const blocked=c && !hasListManagement() && c.completed_by!==user.id;
         const draft=taskDrafts.get(t.id)||{};
         const fields=fieldsForTask(currentType,t).map(([key,label])=>{const employeeReadOnly=KITCHEN_MODE&&user.role==='employee';return `<label class="task-field ${employeeReadOnly?'employee-readonly-field':''}"><span>${escapeHtml(label)}</span><input type="text" inputmode="text" maxlength="50" data-task-field="${key}" value="${escapeHtml(record?.[key] ?? '')}" ${employeeReadOnly?'disabled':''} aria-label="${escapeHtml(label)} pour ${escapeHtml(t.title)}"></label>`;}).join('');
         const productionMeta=c&&c.actual_quantity!=null?`<small>Réalisé : ${escapeHtml(c.actual_quantity)} / ${escapeHtml(c.requested_quantity||c.quantity_value||'—')}</small>${c.shortfall_reason?`<small class="shortfall-label">Motif : ${escapeHtml(c.shortfall_reason)}</small>`:''}`:'';
         const inventoryNow=String(draft.inventory_value ?? record?.inventory_value ?? '').trim();
         const quantityNow=String(draft.quantity_value ?? record?.quantity_value ?? '').trim();
-        const missingProduction=currentType==='afternoon'&&user.role==='manager'&&!c&&Boolean(inventoryNow)&&!quantityNow;
-        const quantityWarning=currentType==='afternoon'&&user.role==='manager'?`<small class="quantity-warning ${missingProduction?'':'hidden'}">Attention : quantité à produire non renseignée.</small>`:'';
+        const missingProduction=currentType==='afternoon'&&hasListManagement()&&!c&&Boolean(inventoryNow)&&!quantityNow;
+        const quantityWarning=currentType==='afternoon'&&hasListManagement()?`<small class="quantity-warning ${missingProduction?'':'hidden'}">Attention : quantité à produire non renseignée.</small>`:'';
         return `<div class="task-row ${c?'done':''}" data-task-row="${escapeHtml(t.id)}"><button class="task-check" data-toggle-task="${escapeHtml(t.id)}" aria-label="${c?'Décocher':'Valider'} ${escapeHtml(t.title)}" ${blocked?'disabled':''}></button><div class="task-main"><span class="task-title">${escapeHtml(t.title)}</span>${t.note?`<span class="task-note">${escapeHtml(t.note)}</span>`:''}<div class="task-fields">${fields}</div>${quantityWarning}</div><div class="task-meta">${c?`<b>${escapeHtml(who||'Réalisé')}</b><small>${escapeHtml(timeLabel(at))}</small>${productionMeta}`:'<small>À faire</small>'}</div></div>`;
       }).join('')}</article>`;
     }).join('');
@@ -1031,7 +1041,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
   async function toggleTask(taskId,productionDetails=null) {
     const task=tasks.find(t=>t.id===taskId); if(!task)return false;
     const existing=getDone(task); const existingRecord=currentCompletion(taskId); const checked=!existing;
-    if (existing && user.role!=='manager' && existing.completed_by && existing.completed_by!==user.id) {
+    if (existing && !hasListManagement() && existing.completed_by && existing.completed_by!==user.id) {
       showToast('Seul un manager peut modifier la validation d’un collègue.');return false;
     }
     if(checked&&currentType==='afternoon'&&!productionDetails){openProductionDialog(task);return false;}
@@ -1119,13 +1129,13 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     }).join('');
   }
   function renderManagerTasks() {
-    if(user?.role!=='manager')return;
+    if(!hasListManagement())return;
     renderIncompleteProductions();
     const type=$('#managerListSelect').value; const rows=listTasks(type,true);
     $('#managerTaskList').innerHTML=rows.length?rows.map(t=>`<div class="manager-task ${t.active===false?'inactive':''}"><div><strong>${escapeHtml(t.title)} ${t.active===false?'<small>(désactivée)</small>':''}</strong><small>${escapeHtml(t.group_name||'Sans rubrique')}${t.note?` · ${escapeHtml(t.note)}`:''}</small></div><button data-edit-task="${escapeHtml(t.id)}">Modifier</button>${t.active===false?`<button data-reactivate-task="${escapeHtml(t.id)}">Réactiver</button>`:`<button class="danger" data-deactivate-task="${escapeHtml(t.id)}">Désactiver</button>`}</div>`).join(''):`<div class="empty-state"><h3>Liste vide</h3><p>Ajoutez les premières préparations ci-dessus.</p></div>`;
   }
   function renderEmployees() {
-    if(user?.role!=='manager')return;
+    if(!hasListManagement())return;
     const list=IS_LIVE()?employees:demo.employees;
     $('#employeeList').innerHTML=list.length?list.map(e=>`<div class="employee-item ${e.active===false?'inactive':''}"><div class="avatar">${escapeHtml((e.full_name||'?').split(/\s+/).map(p=>p[0]).join('').slice(0,2).toUpperCase())}</div><div><strong>${escapeHtml(e.full_name)} ${e.active===false?'<small>(désactivé)</small>':''}</strong><small>${escapeHtml(e.role==='employee'?'Connexion par nom et PIN':(e.email||e.login||'Compte manager'))} · ${escapeHtml(e.role||'employee')}</small></div>${e.role==='manager'?'<span class="muted">Manager</span>':e.active===false?'<button data-reactivate-employee="'+escapeHtml(e.id)+'">Réactiver</button>':'<button data-set-employee-pin="'+escapeHtml(e.id)+'">Définir le PIN</button><button class="danger" data-deactivate-employee="'+escapeHtml(e.id)+'">Désactiver</button>'}</div>`).join(''):`<div class="empty-state"><p>Aucun employé enregistré.</p></div>`;
   }
@@ -1205,7 +1215,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
   }
 
   function exportHistoryCsv() {
-    if(user?.role!=='manager'){showToast('Export réservé aux managers.');return;}
+    if(!hasListManagement()){showToast('Export réservé aux managers.');return;}
     const rows=history.map(e=>[localDayKey(new Date(e.created_at)),timeLabel(e.created_at),TYPES[e.list_type]?.title||'Administration',e.actor_name,e.action,e.title,e.details?.description||'']);
     const quote=v=>'\"'+String(v??'').replace(/\"/g,'\"\"')+'\"';
     const csv='\uFEFF'+[['Date','Heure','Liste','Personne','Action','Élément','Détail'],...rows].map(r=>r.map(quote).join(';')).join('\r\n');
@@ -1213,8 +1223,11 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
   }
 
   function managerTab(name) {
+    if(!hasAdvancedManagement()&&name!=='tasks')return;
     $$('.manager-tab').forEach(b=>b.classList.toggle('active',b.dataset.managerTab===name));
-    $('#managerTasksPanel').classList.toggle('hidden',name!=='tasks');$('#managerStaffPanel').classList.toggle('hidden',name!=='staff');$('#managerQrPanel').classList.toggle('hidden',name!=='qr');
+    $('#managerTasksPanel').classList.toggle('hidden',name!=='tasks');
+    $('#managerStaffPanel').classList.toggle('hidden',name!=='staff'||!hasAdvancedManagement());
+    $('#managerQrPanel').classList.toggle('hidden',name!=='qr'||!hasAdvancedManagement());
   }
   function makeQr() {
     const root=$('#qrCodeCanvas');root.innerHTML='';
@@ -1227,15 +1240,13 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
   }
 
   // Events
-  $$('.login-tab').forEach(b=>b.addEventListener('click',()=>switchLoginTab(b.dataset.loginTab)));
-  $('#employeeLoginForm').addEventListener('submit',async e=>{e.preventDefault();setLoginError('');try{IS_LIVE()?await loginLive(e.currentTarget):await loginDemo(e.currentTarget,'employee');}catch(err){setLoginError(err.message||'Connexion impossible.');}});
-  $('#managerLoginForm').addEventListener('submit',async e=>{e.preventDefault();setLoginError('');try{IS_LIVE()?await loginLive(e.currentTarget):await loginDemo(e.currentTarget,'manager');}catch(err){setLoginError(err.message||'Connexion impossible.');}});
+  $('#employeeLoginForm').addEventListener('submit',async e=>{e.preventDefault();setLoginError('');try{IS_LIVE()?await loginLive(e.currentTarget):await loginDemo(e.currentTarget);}catch(err){setLoginError(err.message||'Connexion impossible.');}});
   function enterPreviewMode(showNotice=true) {
     previewMode=true;
     localStorage.setItem('pokawa-kitchen-preview-mode','1');
     demo=demo||loadDemo();
     document.body.classList.add('preview-mode');
-    user={id:'demo-manager',full_name:'Manager · Développeur',role:'manager',mode:'demo'};
+    user={id:'demo-manager',full_name:'Application développement',role:'manager',access_level:'manager_advanced',mode:'demo'};
     employees=demo.employees.map(e=>({...e}));
     tasks=demo.tasks;
     completions=Object.values(demo.completions);
@@ -1245,7 +1256,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     if(showNotice) showToast('Mode développeur · session conservée sur cet appareil');
   }
   $('#quickManagerLogin').addEventListener('click',()=>enterPreviewMode());
-  $('#logoutBtn').addEventListener('click',async()=>{if(KITCHEN_MODE){showKitchenLogin();return;}if(IS_LIVE())await DB.auth.signOut();previewMode=false;localStorage.removeItem('pokawa-kitchen-preview-mode');document.body.classList.remove('preview-mode');showLogin();});
+  $('#logoutBtn').addEventListener('click',async()=>{if(IS_LIVE())await DB.auth.signOut();previewMode=false;localStorage.removeItem('pokawa-kitchen-preview-mode');document.body.classList.remove('preview-mode');showLogin();});
   $('#kitchenQuickLogin').addEventListener('click',()=>{
     if(!FORCE_DEMO_MODE||IS_LIVE())return;
     const found=(demo?.employees||[]).find(e=>e.role==='employee'&&e.active!==false);
@@ -1272,10 +1283,10 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
   $('#closeProductionDialog').addEventListener('click',()=>$('#productionCompletionDialog').close());
   $('#cancelProductionDialog').addEventListener('click',()=>$('#productionCompletionDialog').close());
   $('#productionCompletionDialog').addEventListener('close',()=>{pendingProductionTaskId=null;});
-  $('#taskGroups').addEventListener('input',e=>{const input=e.target.closest('[data-task-field]');if(!input)return;const row=input.closest('[data-task-row]');if(!row)return;const draft=taskDrafts.get(row.dataset.taskRow)||{};draft[input.dataset.taskField]=input.value;taskDrafts.set(row.dataset.taskRow,draft);if(currentType==='afternoon'&&user?.role==='manager'){const warning=row.querySelector('.quantity-warning');if(warning){const inv=String(draft.inventory_value??row.querySelector('[data-task-field="inventory_value"]')?.value??'').trim();const qty=String(draft.quantity_value??row.querySelector('[data-task-field="quantity_value"]')?.value??'').trim();warning.classList.toggle('hidden',!inv||Boolean(qty));}}});
-  $('#taskGroups').addEventListener('change',async e=>{const input=e.target.closest('[data-task-field="quantity_value"]');if(!input||currentType!=='afternoon'||user?.role!=='manager')return;const value=input.value.trim();if(value!=='0')return;const row=input.closest('[data-task-row]');if(!row)return;const inventory=row.querySelector('[data-task-field="inventory_value"]')?.value.trim()||'';if(!inventory){showToast('Renseigne d’abord l’inventaire avant de valider une production à zéro.');return;}const taskId=row.dataset.taskRow;if(getDone(tasks.find(t=>t.id===taskId)))return;const saved=await toggleTask(taskId,{requested_quantity:'0',actual_quantity:'0',shortfall_reason:null,shortfall_comment:null});if(saved)showToast('Aucune production nécessaire : préparation validée par le manager.');});
+  $('#taskGroups').addEventListener('input',e=>{const input=e.target.closest('[data-task-field]');if(!input)return;const row=input.closest('[data-task-row]');if(!row)return;const draft=taskDrafts.get(row.dataset.taskRow)||{};draft[input.dataset.taskField]=input.value;taskDrafts.set(row.dataset.taskRow,draft);if(currentType==='afternoon'&&hasListManagement()){const warning=row.querySelector('.quantity-warning');if(warning){const inv=String(draft.inventory_value??row.querySelector('[data-task-field="inventory_value"]')?.value??'').trim();const qty=String(draft.quantity_value??row.querySelector('[data-task-field="quantity_value"]')?.value??'').trim();warning.classList.toggle('hidden',!inv||Boolean(qty));}}});
+  $('#taskGroups').addEventListener('change',async e=>{const input=e.target.closest('[data-task-field="quantity_value"]');if(!input||currentType!=='afternoon'||!hasListManagement())return;const value=input.value.trim();if(value!=='0')return;const row=input.closest('[data-task-row]');if(!row)return;const inventory=row.querySelector('[data-task-field="inventory_value"]')?.value.trim()||'';if(!inventory){showToast('Renseigne d’abord l’inventaire avant de valider une production à zéro.');return;}const taskId=row.dataset.taskRow;if(getDone(tasks.find(t=>t.id===taskId)))return;const saved=await toggleTask(taskId,{requested_quantity:'0',actual_quantity:'0',shortfall_reason:null,shortfall_comment:null});if(saved)showToast('Aucune production nécessaire : préparation validée par le manager.');});
   $('#managerApproveListBtn').addEventListener('click',()=>{
-    if(user?.role!=='manager')return;
+    if(!hasListManagement())return;
     if(IS_LIVE()){showToast('La validation finale des listes connectées nécessite encore son enregistrement sécurisé.');return;}
     const progress=countType(currentType);
     if(!progress.all||progress.done!==progress.all){showToast('Toutes les préparations doivent être cochées avant validation manager.');return;}
@@ -1294,33 +1305,24 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
   $$('.manager-tab').forEach(b=>b.addEventListener('click',()=>managerTab(b.dataset.managerTab)));
   $('#generateQrBtn').addEventListener('click',makeQr);$('#printQrBtn').addEventListener('click',()=>{makeQr();setTimeout(()=>window.print(),400);});
 
-  // Initial screen / explain demo versus connected deployment.
-  if(KITCHEN_MODE){
-    renderKitchenEmployeeOptions();
-    $('#kitchenLoginScreen').classList.remove('hidden');
-    $('#loginScreen').classList.add('hidden');
-    if(!IS_LIVE()) showKitchenLogin();
-  } else if(IS_LIVE()){
-    loadEmployeeLoginOptions();
-    document.querySelector('label[for="managerEmail"]').textContent='Adresse e-mail manager';
-    $('#modeNotice').className='mode-notice live';$('#modeNotice').textContent='Mode connecté prêt. Les comptes employés et managers doivent être créés dans votre espace de gestion.';
-    $('#quickManagerLogin').classList.remove('hidden');
-    $('#quickManagerLogin').textContent='Aperçu rapide · Manager';
-    DB.auth.getSession().then(async({data})=>{if(data.session){try{const {data:p}=await DB.from('profiles').select('id,full_name,role,active').eq('id',data.session.user.id).single();if(p?.active){user={...p,mode:'live'};await loadLiveData();setupRealtime();showApp();}}catch(_){}}});
+  // One shared PIN login on phone, tablet and desktop.
+  $('#quickManagerLogin').classList.remove('hidden');
+  $('#quickManagerLogin').textContent='Connexion rapide · Application développement';
+  loadEmployeeLoginOptions();
+  if(IS_LIVE()){
+    $('#modeNotice').className='mode-notice live';
+    $('#modeNotice').textContent='Connexion sécurisée. Choisis ton nom et saisis ton code personnel.';
   } else if(HAS_LIVE_CONFIG && !previewMode){
     $('#modeNotice').className='mode-notice';
-    $('#modeNotice').textContent='La configuration en ligne est renseignée, mais le module de connexion ne s’est pas chargé. Vérifiez la connexion Internet puis rechargez la page. Les données locales ne seront pas utilisées.';
+    $('#modeNotice').textContent='Le service de connexion ne s’est pas chargé. Vérifie Internet puis réessaie. Le mode développement reste accessible.';
     $('#employeeLoginForm button[type="submit"]').disabled=true;
-    $('#managerLoginForm button[type="submit"]').disabled=true;
-    $('#quickManagerLogin').classList.add('hidden');
   } else {
-    $('#quickManagerLogin').classList.remove('hidden');
-    loadEmployeeLoginOptions();
-    document.querySelector('label[for="managerEmail"]').textContent='Identifiant manager';
-    $('#modeNotice').className='mode-notice';$('#modeNotice').innerHTML='<strong>Mode démonstration local.</strong><br>Employé : <b>employe1</b> / <b>1234</b> · Manager : <b>manager</b> / <b>2468</b>. Les données restent sur cet appareil et ne sont pas partagées.';
-    $('#employeeName').placeholder='Votre nom';$('#employeePin').placeholder='Code à 4 chiffres';$('#managerEmail').placeholder='manager';
+    $('#modeNotice').className='mode-notice';
+    $('#modeNotice').textContent='Mode développement local : les comptes et validations restent enregistrés sur cet appareil.';
+    $('#employeeName').placeholder='Choisir dans la liste';
+    $('#employeePin').placeholder='Code à 4 chiffres';
   }
-  if(previewMode && !KITCHEN_MODE) enterPreviewMode(false);
+  if(previewMode) enterPreviewMode(false);
   if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 })();
 
