@@ -70,6 +70,7 @@
 .kitchen-key.utility{font-size:13px;color:#68776e}
 .kitchen-key:disabled,.kitchen-employee-select:disabled{opacity:.45;cursor:not-allowed}
 .kitchen-login-error{min-height:20px;color:var(--red);font-size:12px;font-weight:700;margin:12px 0 0}
+.kitchen-quick-login{margin-top:14px;background:#244c3d!important}.kitchen-quick-login-note{margin:7px 0 0;font-size:11px;color:#8a6b35;line-height:1.4}
 .kitchen-login-foot{margin:14px 0 0;font-size:10px;color:#89958e}
 .kitchen-live-notice{margin:12px 0 0;padding:12px;border-radius:12px;background:#fff7e7;border:1px solid #f1dfb5;color:#73531c;font-size:11px;line-height:1.45;text-align:left}
 .kitchen-manager-link{display:inline-block;margin-top:14px;font-size:11px;color:#65776b;text-decoration:underline}
@@ -184,6 +185,8 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
         <button class="kitchen-key" type="button" data-kitchen-pin="0">0</button>
         <button class="kitchen-key utility" type="button" data-kitchen-pin="backspace" aria-label="Effacer le dernier chiffre">⌫</button>
       </div>
+      <button id="kitchenQuickLogin" class="btn primary full kitchen-quick-login hidden" type="button">Connexion rapide · aperçu développeur</button>
+      <p id="kitchenQuickLoginNote" class="kitchen-quick-login-note hidden">Accès temporaire sans code PIN, uniquement pour tester l’interface en mode démo.</p>
       <div id="kitchenLoginError" class="kitchen-login-error" role="alert"></div>
       <div id="kitchenLiveNotice" class="kitchen-live-notice hidden"></div>
       <div id="kitchenDemoNotice" class="kitchen-live-notice hidden"></div>
@@ -683,6 +686,9 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     const notice=$('#kitchenLiveNotice');
     notice.classList.toggle('hidden',!locked);
     if(locked) notice.textContent='La connexion par code PIN est en cours de préparation pour la version connectée. Elle doit être reliée à une vérification sécurisée côté serveur avant utilisation réelle. Pour tester cette interface, ouvre ?mode=kitchen&demo=1.';
+    const quickAllowed=FORCE_DEMO_MODE&&!locked;
+    $('#kitchenQuickLogin').classList.toggle('hidden',!quickAllowed);
+    $('#kitchenQuickLoginNote').classList.toggle('hidden',!quickAllowed);
     const demoNotice=$('#kitchenDemoNotice');
     demoNotice.classList.toggle('hidden',locked);
     if(!locked) demoNotice.textContent='Mode démonstration : les comptes et les validations restent enregistrés uniquement sur cet appareil. Ils ne sont pas synchronisés avec les téléphones du management.';
@@ -700,6 +706,12 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     kitchenPin+=value;updateKitchenPinDots();
     if(kitchenPin.length===4) setTimeout(attemptKitchenLogin,120);
   }
+  function loginKitchenEmployee(found) {
+    kitchenFailedAttempts=0;
+    user={id:found.id,full_name:found.full_name,role:'employee',mode:'demo'};
+    employees=demo.employees.map(e=>({...e}));tasks=demo.tasks;completions=Object.values(demo.completions);history=demo.history;dailyContext=demo.dailyContext[localDate()]||{};
+    showApp();
+  }
   function attemptKitchenLogin() {
     const selectedId=$('#kitchenEmployeeSelect').value;
     const found=demo?.employees.find(e=>e.id===selectedId&&e.role==='employee'&&e.active!==false);
@@ -708,10 +720,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
       $('#kitchenLoginError').textContent='Code incorrect. Vérifie ton prénom et réessaie.';
       kitchenPin='';updateKitchenPinDots();return;
     }
-    kitchenFailedAttempts=0;
-    user={id:found.id,full_name:found.full_name,role:'employee',mode:'demo'};
-    employees=demo.employees.map(e=>({...e}));tasks=demo.tasks;completions=Object.values(demo.completions);history=demo.history;dailyContext=demo.dailyContext[localDate()]||{};
-    showApp();
+    loginKitchenEmployee(found);
   }
   function renderKitchenHome() {
     $('#kitchenTodayDate').textContent=shortDate(localDate());
@@ -1149,6 +1158,13 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
   }
   $('#quickManagerLogin').addEventListener('click',()=>enterPreviewMode());
   $('#logoutBtn').addEventListener('click',async()=>{if(KITCHEN_MODE){showKitchenLogin();return;}if(IS_LIVE())await DB.auth.signOut();previewMode=false;localStorage.removeItem('pokawa-kitchen-preview-mode');document.body.classList.remove('preview-mode');showLogin();});
+  $('#kitchenQuickLogin').addEventListener('click',()=>{
+    if(!FORCE_DEMO_MODE||IS_LIVE())return;
+    const found=(demo?.employees||[]).find(e=>e.role==='employee'&&e.active!==false);
+    if(!found){$('#kitchenLoginError').textContent='Aucun employé actif disponible pour le test.';return;}
+    $('#kitchenEmployeeSelect').value=found.id;
+    loginKitchenEmployee(found);
+  });
   $('#kitchenEmployeeSelect').addEventListener('change',()=>{kitchenPin='';updateKitchenPinDots();$('#kitchenLoginError').textContent='';});
   $('#kitchenPinPad').addEventListener('click',event=>{const button=event.target.closest('[data-kitchen-pin]');if(button)kitchenPinAction(button.dataset.kitchenPin);});
   $('#kitchenLoginScreen').addEventListener('keydown',event=>{if(event.key>='0'&&event.key<='9')kitchenPinAction(event.key);else if(event.key==='Backspace')kitchenPinAction('backspace');else if(event.key==='Escape')kitchenPinAction('clear');});
