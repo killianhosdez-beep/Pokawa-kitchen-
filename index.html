@@ -209,10 +209,10 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
         <button class="login-tab" data-login-tab="manager">Manager</button>
       </div>
       <form id="employeeLoginForm" class="login-form">
-        <label for="employeeEmail">Adresse e-mail ou identifiant (démo)</label>
-        <input id="employeeEmail" name="employeeEmail" type="text" autocomplete="username" placeholder="prenom@exemple.fr" required>
-        <label for="employeePassword">Mot de passe</label>
-        <input id="employeePassword" name="employeePassword" type="password" autocomplete="current-password" placeholder="Votre mot de passe" required>
+        <label for="employeeName">Nom et prénom</label>
+        <input id="employeeName" name="employeeName" type="text" autocomplete="username" placeholder="Votre nom" required>
+        <label for="employeePin">Code personnel à 4 chiffres</label>
+        <input id="employeePin" name="employeePin" type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" autocomplete="one-time-code" placeholder="••••" required>
         <button class="btn primary full" type="submit">Accéder aux checklists</button>
       </form>
       <form id="managerLoginForm" class="login-form hidden">
@@ -675,7 +675,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     $('#appShell').classList.add('hidden'); $('#loginScreen').classList.remove('hidden');
     if (realtimeChannel && DB) DB.removeChannel(realtimeChannel);
     realtimeChannel = null; user = null; morningContextDraft = {}; taskDrafts.clear();
-    $('#employeePassword').value=''; $('#managerPassword').value=''; setLoginError('');
+    $('#employeePin').value=''; $('#managerPassword').value=''; setLoginError('');
   }
   function renderKitchenEmployeeOptions() {
     const select=$('#kitchenEmployeeSelect');
@@ -763,14 +763,14 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
   }
 
   async function loginDemo(form, role) {
-    const data = new FormData(form); const login=(data.get(role==='manager'?'managerEmail':'employeeEmail')||'').toString().trim().toLowerCase();
-    const pass=(data.get(role==='manager'?'managerPassword':'employeePassword')||'').toString();
+    const data = new FormData(form); const login=(data.get(role==='manager'?'managerEmail':'employeeName')||'').toString().trim().toLowerCase();
+    const pass=(data.get(role==='manager'?'managerPassword':'employeePin')||'').toString();
     if (role==='manager') {
       if (login===demo.manager.login && pass===demo.manager.password) user={id:'demo-manager',full_name:'Manager',role:'manager',mode:'demo'};
       else throw new Error('Identifiant ou code manager incorrect. Démo : manager / 2468.');
     } else {
-      const found=demo.employees.find(e=>e.active && (e.login.toLowerCase()===login || e.full_name.toLowerCase()===login));
-      if (!found || found.password!==pass) throw new Error('Identifiant ou code employé incorrect. Démo : employe1 / 1234 ou employe2 / 1234.');
+      const found=demo.employees.find(e=>e.active && e.role==='employee' && e.full_name.toLowerCase()===login);
+      if (!found || String(found.pin||'')!==pass) throw new Error('Nom ou code personnel incorrect.');
       user={id:found.id,full_name:found.full_name,role:'employee',mode:'demo'};
     }
     employees=demo.employees.map(e=>({...e})); tasks=demo.tasks; completions=Object.values(demo.completions); history=demo.history; dailyContext=demo.dailyContext[localDate()]||{};
@@ -779,14 +779,28 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
 
   async function loginLive(form) {
     const data = new FormData(form);
-    const email=(data.get(form.id==='managerLoginForm'?'managerEmail':'employeeEmail')||'').toString().trim();
-    const password=(data.get(form.id==='managerLoginForm'?'managerPassword':'employeePassword')||'').toString();
-    const {data:authData,error}=await DB.auth.signInWithPassword({email,password});
-    if (error) throw error;
-    const {data:profile,error:profileError}=await DB.from('profiles').select('id,full_name,role,active').eq('id',authData.user.id).single();
-    if (profileError || !profile || !profile.active) { await DB.auth.signOut(); throw new Error('Compte non activé. Contacte un manager.'); }
-    if (form.id==='managerLoginForm' && profile.role!=='manager') { await DB.auth.signOut(); throw new Error('Ce compte ne possède pas les droits manager.'); }
-    user={id:profile.id,full_name:profile.full_name,role:profile.role,mode:'live'};
+    if(form.id==='employeeLoginForm'){
+      const full_name=(data.get('employeeName')||'').toString().trim();
+      const pin=(data.get('employeePin')||'').toString();
+      if(!/^\d{4}$/.test(pin)) throw new Error('Le code personnel doit contenir 4 chiffres.');
+      const {data:loginData,error}=await DB.functions.invoke('employee-pin-login',{body:{full_name,pin}});
+      if(error) throw error;
+      if(loginData?.error) throw new Error(loginData.error);
+      const {data:authData,error:authError}=await DB.auth.verifyOtp({token_hash:loginData.token_hash,type:'magiclink'});
+      if(authError) throw authError;
+      const {data:profile,error:profileError}=await DB.from('profiles').select('id,full_name,role,active').eq('id',authData.user.id).single();
+      if(profileError||!profile||!profile.active||profile.role!=='employee'){await DB.auth.signOut();throw new Error('Compte employé inactif. Contacte un manager.');}
+      user={id:profile.id,full_name:profile.full_name,role:profile.role,mode:'live'};
+    } else {
+      const email=(data.get('managerEmail')||'').toString().trim();
+      const password=(data.get('managerPassword')||'').toString();
+      const {data:authData,error}=await DB.auth.signInWithPassword({email,password});
+      if(error) throw error;
+      const {data:profile,error:profileError}=await DB.from('profiles').select('id,full_name,role,active').eq('id',authData.user.id).single();
+      if(profileError||!profile||!profile.active){await DB.auth.signOut();throw new Error('Compte non activé. Contacte un manager.');}
+      if(profile.role!=='manager'){await DB.auth.signOut();throw new Error('Ce compte ne possède pas les droits manager.');}
+      user={id:profile.id,full_name:profile.full_name,role:profile.role,mode:'live'};
+    }
     await loadLiveData(); setupRealtime(); showApp();
   }
 
@@ -1234,7 +1248,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     $('#loginScreen').classList.add('hidden');
     if(!IS_LIVE()) showKitchenLogin();
   } else if(IS_LIVE()){
-    document.querySelector('label[for="employeeEmail"]').textContent='Adresse e-mail';
+    document.querySelector('label[for="employeeName"]').textContent='Nom et prénom';
     document.querySelector('label[for="managerEmail"]').textContent='Adresse e-mail manager';
     $('#modeNotice').className='mode-notice live';$('#modeNotice').textContent='Mode connecté prêt. Les comptes employés et managers doivent être créés dans votre espace de gestion.';
     $('#quickManagerLogin').classList.remove('hidden');
@@ -1248,10 +1262,10 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     $('#quickManagerLogin').classList.add('hidden');
   } else {
     $('#quickManagerLogin').classList.remove('hidden');
-    document.querySelector('label[for="employeeEmail"]').textContent='Identifiant employé';
+    document.querySelector('label[for="employeeName"]').textContent='Nom et prénom';
     document.querySelector('label[for="managerEmail"]').textContent='Identifiant manager';
     $('#modeNotice').className='mode-notice';$('#modeNotice').innerHTML='<strong>Mode démonstration local.</strong><br>Employé : <b>employe1</b> / <b>1234</b> · Manager : <b>manager</b> / <b>2468</b>. Les données restent sur cet appareil et ne sont pas partagées.';
-    $('#employeeEmail').placeholder='employe1';$('#managerEmail').placeholder='manager';
+    $('#employeeName').placeholder='Votre nom';$('#employeePin').placeholder='Code à 4 chiffres';$('#managerEmail').placeholder='manager';
   }
   if(previewMode && !KITCHEN_MODE) enterPreviewMode(false);
   if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
