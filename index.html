@@ -654,6 +654,9 @@ html.kitchen-route #kitchenLoginScreen{display:none!important}
     const previous=select.value;
     const requestedLive=IS_LIVE();
     try{
+      const localDemo=demo||loadDemo();
+      demo=localDemo;
+      const localStaff=(Array.isArray(localDemo?.employees)?localDemo.employees:[]).filter(e=>e.active!==false);
       let staff=[];
       if(requestedLive){
         const {data,error}=await DB.functions.invoke('employee-pin-login',{body:{action:'list'}});
@@ -661,11 +664,12 @@ html.kitchen-route #kitchenLoginScreen{display:none!important}
         if(!IS_LIVE())return loadEmployeeLoginOptions();
         if(error)throw error;
         if(data?.error)throw new Error(data.error);
-        staff=(data?.employees||[]).filter(e=>e.active!==false);
+        const liveStaff=(data?.employees||[]).filter(e=>e.active!==false);
+        // Also expose locally-created demo accounts so they can be selected and tested on this device.
+        const liveNames=new Set(liveStaff.map(e=>String(e.full_name||'').toLocaleLowerCase('fr-FR')));
+        staff=[...liveStaff,...localStaff.filter(e=>!liveNames.has(String(e.full_name||'').toLocaleLowerCase('fr-FR')))];
       }else{
-        const localDemo=demo||loadDemo();
-        demo=localDemo;
-        staff=(Array.isArray(localDemo?.employees)?localDemo.employees:[]).filter(e=>e.active!==false);
+        staff=localStaff;
       }
       select.innerHTML='<option value="">Choisir votre nom dans la liste</option>'+staff
         .sort((a,b)=>String(a.full_name||'').localeCompare(String(b.full_name||''),'fr'))
@@ -1299,7 +1303,20 @@ html.kitchen-route #kitchenLoginScreen{display:none!important}
   }
 
   // Events
-  $('#employeeLoginForm').addEventListener('submit',async e=>{e.preventDefault();setLoginError('');try{IS_LIVE()?await loginLive(e.currentTarget):await loginDemo(e.currentTarget);}catch(err){setLoginError(err.message||'Connexion impossible.');}});
+  $('#employeeLoginForm').addEventListener('submit',async e=>{
+    e.preventDefault();setLoginError('');
+    try{
+      const selectedName=String(new FormData(e.currentTarget).get('employeeName')||'').trim();
+      const localAccount=(demo||loadDemo()).employees.find(person=>person.active!==false&&String(person.full_name||'').toLocaleLowerCase('fr-FR')===selectedName.toLocaleLowerCase('fr-FR'));
+      if(localAccount){
+        previewMode=true;
+        localStorage.setItem('pokawa-kitchen-preview-mode','1');
+        document.body.classList.add('preview-mode');
+        await loginDemo(e.currentTarget);
+      }else if(IS_LIVE()) await loginLive(e.currentTarget);
+      else await loginDemo(e.currentTarget);
+    }catch(err){setLoginError(err.message||'Connexion impossible.');}
+  });
   function enterPreviewMode(showNotice=true) {
     previewMode=true;
     localStorage.setItem('pokawa-kitchen-preview-mode','1');
