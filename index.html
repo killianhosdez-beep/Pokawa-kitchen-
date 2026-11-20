@@ -1135,11 +1135,19 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
     $('#managerTaskList').innerHTML=rows.length?rows.map(t=>`<div class="manager-task ${t.active===false?'inactive':''}"><div><strong>${escapeHtml(t.title)} ${t.active===false?'<small>(désactivée)</small>':''}</strong><small>${escapeHtml(t.group_name||'Sans rubrique')}${t.note?` · ${escapeHtml(t.note)}`:''}</small></div><button data-edit-task="${escapeHtml(t.id)}">Modifier</button>${t.active===false?`<button data-reactivate-task="${escapeHtml(t.id)}">Réactiver</button>`:`<button class="danger" data-deactivate-task="${escapeHtml(t.id)}">Désactiver</button>`}</div>`).join(''):`<div class="empty-state"><h3>Liste vide</h3><p>Ajoutez les premières préparations ci-dessus.</p></div>`;
   }
   function renderEmployees() {
-    if(!hasListManagement())return;
+    if(!hasAdvancedManagement())return;
     const list=IS_LIVE()?employees:demo.employees;
-    $('#employeeList').innerHTML=list.length?list.map(e=>`<div class="employee-item ${e.active===false?'inactive':''}"><div class="avatar">${escapeHtml((e.full_name||'?').split(/\s+/).map(p=>p[0]).join('').slice(0,2).toUpperCase())}</div><div><strong>${escapeHtml(e.full_name)} ${e.active===false?'<small>(désactivé)</small>':''}</strong><small>${escapeHtml(e.role==='employee'?'Connexion par nom et PIN':(e.email||e.login||'Compte manager'))} · ${escapeHtml(e.role||'employee')}</small></div>${e.role==='manager'?'<span class="muted">Manager</span>':e.active===false?'<button data-reactivate-employee="'+escapeHtml(e.id)+'">Réactiver</button>':'<button data-set-employee-pin="'+escapeHtml(e.id)+'">Définir le PIN</button><button class="danger" data-deactivate-employee="'+escapeHtml(e.id)+'">Désactiver</button>'}</div>`).join(''):`<div class="empty-state"><p>Aucun employé enregistré.</p></div>`;
+    const accounts=list.filter(e=>e.role==='employee'||e.role==='manager');
+    const roleOptions=[['employee','Employé'],['manager_simple','Manager simple'],['manager_advanced','Manager avancé']];
+    $('#employeeList').innerHTML=accounts.length?accounts.map(e=>{
+      const access=e.access_level||(e.role==='manager'?'manager_advanced':'employee');
+      const roleSelect='<select aria-label="Niveau d’accès de '+escapeHtml(e.full_name)+'" data-account-role="'+escapeHtml(e.id)+'" '+(e.active===false?'disabled':'')+'>'+roleOptions.map(([v,l])=>'<option value="'+v+'" '+(access===v?'selected':'')+'>'+l+'</option>').join('')+'</select>';
+      const actions=e.active===false
+        ?'<button data-reactivate-employee="'+escapeHtml(e.id)+'">Réactiver</button>'
+        :'<button data-set-employee-pin="'+escapeHtml(e.id)+'">Modifier le PIN</button><button class="danger" data-deactivate-employee="'+escapeHtml(e.id)+'">Désactiver</button>';
+      return '<div class="employee-item '+(e.active===false?'inactive':'')+'"><div class="avatar">'+escapeHtml((e.full_name||'?').split(/\s+/).map(p=>p[0]).join('').slice(0,2).toUpperCase())+'</div><div><strong>'+escapeHtml(e.full_name)+(e.active===false?' <small>(désactivé)</small>':'')+'</strong><small>'+accessLevelLabel({role:e.role,access_level:access})+'</small>'+roleSelect+'</div>'+actions+'</div>';
+    }).join(''):'<div class="empty-state"><p>Aucun compte enregistré.</p></div>';
   }
-
   async function addTask(event) {
     event.preventDefault(); const title=$('#newTaskName').value.trim(); const group=$('#newTaskGroup').value.trim(); if(!title)return;
     try {
@@ -1171,27 +1179,33 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
 
   async function addEmployee(event) {
     event.preventDefault();
+    if(!hasAdvancedManagement()){showToast('Action réservée au manager avancé.');return;}
     const full_name=$('#newEmployeeName').value.trim().replace(/\s+/g,' ');
+    const access_level=$('#newEmployeeRole').value;
     const pin=$('#newEmployeePin').value.trim();
-    if(!full_name){showToast('Renseigne le nom et le prénom de l’employé.');return;}
+    if(!full_name){showToast('Renseigne le nom et le prénom.');return;}
+    if(!['employee','manager_simple','manager_advanced'].includes(access_level)){showToast('Niveau d’accès invalide.');return;}
     if(!/^\d{4}$/.test(pin)){showToast('Le code personnel doit contenir exactement 4 chiffres.');return;}
     try{
       const staff=IS_LIVE()?employees:demo.employees;
-      if(staff.some(e=>e.role==='employee'&&String(e.full_name||'').toLocaleLowerCase('fr-FR')===full_name.toLocaleLowerCase('fr-FR')))throw new Error('Un employé porte déjà ce nom.');
-      if(staff.some(e=>e.role==='employee'&&String(e.pin||'')===pin))throw new Error('Ce code PIN est déjà utilisé par un autre employé.');
+      if(staff.some(e=>String(e.full_name||'').toLocaleLowerCase('fr-FR')===full_name.toLocaleLowerCase('fr-FR')))throw new Error('Un compte porte déjà ce nom.');
+      if(staff.some(e=>String(e.pin||'')===pin))throw new Error('Ce code PIN est déjà utilisé par un autre compte.');
       if(IS_LIVE()){
-        const {data,error}=await DB.functions.invoke('admin-create-employee',{body:{full_name,pin}});
+        const {data,error}=await DB.functions.invoke('admin-create-employee',{body:{full_name,pin,access_level}});
         if(error)throw error;if(data?.error)throw new Error(data.error);await loadLiveData();
-      } else {
-        demo.employees.push({id:uuid(),full_name,email:'',login:full_name,password:'',pin,role:'employee',active:true});
-        logDemo('Ajout d’employé','',full_name);saveDemo();employees=demo.employees;
+      }else{
+        demo.employees.push({id:uuid(),full_name,email:'',login:full_name,password:'',pin,
+          role:access_level==='employee'?'employee':'manager',access_level,active:true});
+        logDemo('Création de compte','',full_name,{description:accessLevelLabel({role:access_level==='employee'?'employee':'manager',access_level})});
+        saveDemo();employees=demo.employees;
       }
-      $('#addEmployeeForm').reset();renderEmployees();renderKitchenEmployeeOptions();showToast('Employé ajouté avec son code personnel.');
+      $('#addEmployeeForm').reset();renderEmployees();loadEmployeeLoginOptions();
+      showToast('Compte créé avec ses autorisations.');
     }catch(err){showToast(`Création impossible : ${err.message||err}`);}
   }
   async function setEmployeePin(id) {
     const staff=IS_LIVE()?employees:demo.employees;
-    const employee=staff.find(e=>e.id===id&&e.role==='employee');
+    const employee=staff.find(e=>e.id===id&&(e.role==='employee'||e.role==='manager'));
     if(!employee)return;
     const pin=window.prompt(`Nouveau code personnel à 4 chiffres pour ${employee.full_name} :`)||'';
     if(!/^\d{4}$/.test(pin)){if(pin)showToast('Le code doit contenir exactement 4 chiffres.');return;}
@@ -1200,22 +1214,45 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
         const {data,error}=await DB.functions.invoke('set-employee-pin',{body:{employee_email:employee.email,pin}});
         if(error)throw error;if(data?.error)throw new Error(data.error);
       }else{
-        if(demo.employees.some(e=>e.id!==id&&e.role==='employee'&&String(e.pin||'')===pin))throw new Error('Ce code PIN est déjà utilisé.');
+        if(demo.employees.some(e=>e.id!==id&&String(e.pin||'')===pin))throw new Error('Ce code PIN est déjà utilisé.');
         employee.pin=pin;saveDemo();employees=demo.employees;
       }
       renderEmployees();showToast('Code personnel enregistré.');
     }catch(err){showToast(`Modification du PIN impossible : ${err.message||err}`);}
   }
-  async function setEmployeeActive(id,active) {
+  async function updateAccountAccess(id,access_level) {
+    if(!hasAdvancedManagement())return;
+    if(!['employee','manager_simple','manager_advanced'].includes(access_level)){showToast('Niveau d’accès invalide.');return;}
     try{
-      if(IS_LIVE()){const {error}=await DB.from('profiles').update({active}).eq('id',id);if(error)throw error;await loadLiveData();}
-      else {const e=demo.employees.find(x=>x.id===id);if(e){e.active=active;logDemo(active?'Réactivation employé':'Désactivation employé','',e.full_name);saveDemo();employees=demo.employees;}}
-      renderEmployees();showToast(active?'Employé réactivé.':'Employé désactivé. Ses anciennes validations sont conservées.');
+      if(IS_LIVE()){
+        const {data,error}=await DB.functions.invoke('update-account-access',{body:{account_id:id,access_level}});
+        if(error)throw error;if(data?.error)throw new Error(data.error);await loadLiveData();
+      }else{
+        const account=demo.employees.find(e=>e.id===id);if(!account)throw new Error('Compte introuvable.');
+        if(id===user?.id&&access_level!=='manager_advanced')throw new Error('Tu ne peux pas retirer tes propres droits avancés.');
+        account.access_level=access_level;account.role=access_level==='employee'?'employee':'manager';
+        saveDemo();employees=demo.employees;
+        logDemo('Modification des autorisations','',account.full_name,{description:accessLevelLabel(account)});
+      }
+      renderEmployees();loadEmployeeLoginOptions();showToast('Niveau d’accès mis à jour.');
+    }catch(err){renderEmployees();showToast(`Modification impossible : ${err.message||err}`);}
+  }
+  async function setEmployeeActive(id,active) {
+    if(!hasAdvancedManagement())return;
+    try{
+      if(IS_LIVE()){
+        const {data,error}=await DB.functions.invoke('update-account-access',{body:{account_id:id,active}});
+        if(error)throw error;if(data?.error)throw new Error(data.error);await loadLiveData();
+      }else{
+        const e=demo.employees.find(x=>x.id===id);
+        if(e){if(id===user?.id&&!active)throw new Error('Tu ne peux pas désactiver ton propre compte avancé.');e.active=active;logDemo(active?'Réactivation compte':'Désactivation compte','',e.full_name);saveDemo();employees=demo.employees;}
+      }
+      renderEmployees();loadEmployeeLoginOptions();showToast(active?'Compte réactivé.':'Compte désactivé. Ses anciennes validations sont conservées.');
     }catch(err){showToast(`Action impossible : ${err.message||err}`);}
   }
 
   function exportHistoryCsv() {
-    if(!hasListManagement()){showToast('Export réservé aux managers.');return;}
+    if(!hasAdvancedManagement()){showToast('Export réservé aux managers avancés.');return;}
     const rows=history.map(e=>[localDayKey(new Date(e.created_at)),timeLabel(e.created_at),TYPES[e.list_type]?.title||'Administration',e.actor_name,e.action,e.title,e.details?.description||'']);
     const quote=v=>'\"'+String(v??'').replace(/\"/g,'\"\"')+'\"';
     const csv='\uFEFF'+[['Date','Heure','Liste','Personne','Action','Élément','Détail'],...rows].map(r=>r.map(quote).join(';')).join('\r\n');
@@ -1302,6 +1339,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
   $('#managerTaskList').addEventListener('click',e=>{const edit=e.target.closest('[data-edit-task]');const deactivate=e.target.closest('[data-deactivate-task]');const activate=e.target.closest('[data-reactivate-task]');if(edit)openEditTask(edit.dataset.editTask);if(deactivate)setTaskActive(deactivate.dataset.deactivateTask,false);if(activate)setTaskActive(activate.dataset.reactivateTask,true);});
   $('#addEmployeeForm').addEventListener('submit',addEmployee);
   $('#employeeList').addEventListener('click',e=>{const de=e.target.closest('[data-deactivate-employee]');const ac=e.target.closest('[data-reactivate-employee]');const pin=e.target.closest('[data-set-employee-pin]');if(de)setEmployeeActive(de.dataset.deactivateEmployee,false);if(ac)setEmployeeActive(ac.dataset.reactivateEmployee,true);if(pin)setEmployeePin(pin.dataset.setEmployeePin);});
+  $('#employeeList').addEventListener('change',e=>{const select=e.target.closest('[data-account-role]');if(select)updateAccountAccess(select.dataset.accountRole,select.value);});
   $$('.manager-tab').forEach(b=>b.addEventListener('click',()=>managerTab(b.dataset.managerTab)));
   $('#generateQrBtn').addEventListener('click',makeQr);$('#printQrBtn').addEventListener('click',()=>{makeQr();setTimeout(()=>window.print(),400);});
 
