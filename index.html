@@ -882,7 +882,7 @@ html.kitchen-route body.kitchen-mode-active #kitchenLoginScreen{display:none!imp
         const who=c?(IS_LIVE()?profileName(c.completed_by):c.actor_name):''; const at=c?.completed_at||c?.updated_at;
         const blocked=c && user.role!=='manager' && c.completed_by!==user.id;
         const draft=taskDrafts.get(t.id)||{};
-        const fields=fieldsForTask(currentType,t).map(([key,label])=>{const employeeReadOnly=KITCHEN_MODE&&user.role==='employee';return `<label class="task-field ${employeeReadOnly?'employee-readonly-field':''}"><span>${escapeHtml(label)}</span><input type="text" inputmode="text" maxlength="50" data-task-field="${key}" value="${escapeHtml(record?.[key] ?? '')}" disabled aria-label="${escapeHtml(label)} pour ${escapeHtml(t.title)}"></label>`;}).join('');
+        const fields=fieldsForTask(currentType,t).map(([key,label])=>{const employeeReadOnly=KITCHEN_MODE&&user.role==='employee';return `<label class="task-field ${employeeReadOnly?'employee-readonly-field':''}"><span>${escapeHtml(label)}</span><input type="text" inputmode="text" maxlength="50" data-task-field="${key}" value="${escapeHtml(record?.[key] ?? '')}" ${employeeReadOnly?'disabled':''} aria-label="${escapeHtml(label)} pour ${escapeHtml(t.title)}"></label>`;}).join('');
         const productionMeta=c&&c.actual_quantity!=null?`<small>Réalisé : ${escapeHtml(c.actual_quantity)} / ${escapeHtml(c.requested_quantity||c.quantity_value||'—')}</small>${c.shortfall_reason?`<small class="shortfall-label">Motif : ${escapeHtml(c.shortfall_reason)}</small>`:''}`:'';
         const inventoryNow=String(draft.inventory_value ?? record?.inventory_value ?? '').trim();
         const quantityNow=String(draft.quantity_value ?? record?.quantity_value ?? '').trim();
